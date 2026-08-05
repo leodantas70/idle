@@ -90,7 +90,7 @@ ok(registrados.size === canais.length, 'todos os canais foram registrados uma ve
 
 console.log('--- scripts injetados nos paineis parseiam ---');
 const pega = (marca) => { const i = index.indexOf(marca); if (i < 0) return null; const ini = index.indexOf('`', i) + 1; return index.slice(ini, index.indexOf('`;', ini)); };
-[['READ_STATE', 'READ_STATE = `'], ['READ_ALERTS', 'READ_ALERTS = `('], ['HUNTS_JS', 'const HUNTS_JS = `'], ['SELLGUARD', 'const SELLGUARD = `']].forEach(([nome, marca]) => {
+[['READ_STATE', 'READ_STATE = `'], ['READ_ALERTS', 'READ_ALERTS = `('], ['HUNTS_JS', 'const HUNTS_JS = `'], ['SELLGUARD', 'const SELLGUARD = `'], ['READ_BAG_IV', 'const READ_BAG_IV = `'], ['SELL_SAFE_POKES', 'const SELL_SAFE_POKES = `'], ['BUY_UB_BATCH', 'const BUY_UB_BATCH = qty => `']].forEach(([nome, marca]) => {
   const cru = pega(marca);
   if (cru == null) { ok(false, nome + ' sumiu do index.html'); return; }
   // o template literal e desescapado antes de rodar no painel; aqui fazemos o mesmo
@@ -109,6 +109,10 @@ const declaraCdFC = index.search(/\blet\s+cdFC\s*=/);
 const usaCdFC = index.indexOf('SB.catches =');
 ok(declaraCdFC >= 0, 'filtros de capturas (cdFC) sao inicializados');
 ok(usaCdFC >= 0 && declaraCdFC < usaCdFC, 'cdFC existe antes de o painel de capturas ser montado');
+ok(index.includes('class="st-buy-ub-all"') && index.includes('[1000, 5000, 10000]'), 'Resumo Geral oferece compra de UB em 1k, 5k e 10k');
+ok(index.includes('id="officialUpdate"') && main.includes("'updater:apply'") && preload.includes('applyOfficialUpdate'), 'atualizador oficial continua acessivel');
+ok(index.includes('orreXpMul') && index.includes('depColeta()') && index.includes('id="tierBtn"'), 'recursos oficiais 1.5.15 de Orre, depot e tierlist permanecem');
+ok(index.includes('num(p&&p.ivTotal)') && index.includes('nL(p.ivTotal)'), 'formato novo de IV e qualidade funciona nos paineis e na venda personalizada');
 
 try { fs.rmSync(path.join(RAIZ, '.teste-tmp'), { recursive: true, force: true }); } catch {}
 console.log(falhas ? '\n' + falhas + ' falha(s)' : '\nInicializacao: tudo certo');

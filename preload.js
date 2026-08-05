@@ -13,5 +13,9 @@ contextBridge.exposeInMainWorld('pokeAPI', {
   notify: (title, body) => ipcRenderer.invoke('notify', title, body),
   readPreset: (name) => ipcRenderer.invoke('preset:read', name),
   logError: (origem, msg) => ipcRenderer.invoke('errlog:write', origem, msg),
-  openErrorLog: () => ipcRenderer.invoke('errlog:open')
+  openErrorLog: () => ipcRenderer.invoke('errlog:open'),
+  saveBackup: (nome, conteudo, cabecalho) => ipcRenderer.invoke('backup:save', nome, conteudo, cabecalho),
+  clearAccount: (i) => ipcRenderer.invoke('conta:limpar', i),
+  fetchUserScript: (url) => ipcRenderer.invoke('userscript:fetch', url),
+  applyOfficialUpdate: () => ipcRenderer.invoke('updater:apply')
 });

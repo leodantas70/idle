@@ -14,9 +14,14 @@ If sh.Run("cmd /c where npm >nul 2>nul", 0, True) <> 0 Then
   WScript.Quit
 End If
 
-' primeira vez: instala com a janela visivel (ela fecha sozinha ao terminar)
-If Not fso.FolderExists(pasta & "\node_modules") Then
-  sh.Run "cmd /c title PokeGrid - primeira instalacao && echo Instalando o necessario, aguarde... && npm install", 1, True
+' primeira vez ou dependencia alterada por uma atualizacao: instala com a janela visivel
+If Not fso.FolderExists(pasta & "\node_modules") Or fso.FileExists(pasta & "\.update-needs-install") Then
+  codigo = sh.Run("cmd /c title PokeGrid - instalando dependencias && echo Instalando o necessario, aguarde... && npm install", 1, True)
+  If codigo <> 0 Then
+    MsgBox "Nao foi possivel instalar as dependencias da atualizacao.", 48, "PokeGrid"
+    WScript.Quit
+  End If
+  If fso.FileExists(pasta & "\.update-needs-install") Then fso.DeleteFile pasta & "\.update-needs-install", True
 End If
 
 ' abre o app sem janela nenhuma (0 = oculta); fechar terminais nao afeta o app

@@ -23,7 +23,7 @@ Electron (Chromium, o motor do Chrome). Cada conta roda numa sessão separada.
 Bug corrigido na **1.5.11**: o painel segurava a atualização enquanto o foco ficava no seletor. Fora isso, o Simples atualiza a cada 10s de propósito, pra pesar menos.
 
 ### Não consigo mudar a pokébola!
-É o "sabonete": o botão **🧼 Limpar jogo** (ligado por padrão) esconde o Auto-Helper do jogo, que é onde fica o seletor de pokébola. Clique no 🧼 na barra do topo pra desligar, troque a bola no Auto-Helper e ligue de novo.
+É o "sabonete": o botão **🧼 Limpar jogo** esconde o Auto-Helper do jogo, que é onde fica o seletor de pokébola. Desde a 1.5.13 basta **passar o mouse** no canto onde ele fica que ele aparece; em versões antigas, desligue o 🧼 na barra do topo, troque a bola e ligue de novo.
 
 ### Como desabilito um script?
 **Opções → Scripts**, desmarque a caixinha. Desde a 1.5.11 isso recarrega as contas e o script para na hora. Antes: desmarque e clique em **⟳ Atualizar tudo**.
@@ -38,6 +38,10 @@ O app nunca resolve captcha. É sempre você, na janela da conta. Proposital, n�
 Com o escudo ligado, o app pede confirmação antes de vender shiny, qualidade Lendária ou acima e itens raros. Desde a 1.5.11 dá pra travar seus próprios itens na engrenagem do painel (**🔒 Cadeado de venda**).
 
 ## Projeto
+
+### Como apoio o projeto?
+Pelo botão **Ajude o projeto** ao lado do logo, no topo do app, ou direto em https://link.mercadopago.com.br/pokegrid (Pix e cartão). Apoio é opcional e não desbloqueia nada; o app é e continua gratuito. **Esse é o único link oficial**: desconfie de qualquer outro.
+
 
 ### Como contribuo?
 Fork de https://github.com/soufoka/PokeGrid-source, rode `npm test` e abra o PR. A `main` é protegida, tudo entra por PR.
