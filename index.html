@@ -538,6 +538,7 @@
         <button id="autoStart" style="display:none" title="Cria um atalho na pasta Inicializar do Windows pra abrir o PokeGrid junto com o sistema">🚀 Abrir com o Windows</button>
         <button id="sndShiny" title="Toca um som quando um shiny aparece (além da notificação)">✨🔊 Som do shiny</button>
         <button id="officialUpdate" title="Baixa atualizações do seu repositório e preserva suas personalizações locais">⬇ Atualizar versão Leo</button>
+        <button id="reloadUi" title="Carrega novamente o index.html sem fechar o PokeGrid">↻ Recarregar interface</button>
         <button id="faqBtn" title="Perguntas frequentes: abre o FAQ no navegador">❓ FAQ</button> <button id="bkExp" title="Salva um arquivo com todas as configurações e o histórico (senhas ficam fora)">💾 Exportar config</button>
         <button id="bkImp" title="Restaura configurações e histórico de um arquivo exportado">📂 Importar config</button>
         <button id="layout">▦ Grade</button>
@@ -1879,6 +1880,7 @@ return {live,hasBalls,hasInv,balls,potions,revives,prevHunt:resumo(P.prev),shiny
   };
   document.getElementById('reloadAll').onclick = () => webviews.forEach((w, i) => { if (!off[i]) w.reload(); });
   document.getElementById('faqBtn').onclick = () => window.open('https://github.com/leodantas70/idle/blob/master/FAQ.md');
+  document.getElementById('reloadUi').onclick = () => location.reload();
   const officialUpdateBtn = document.getElementById('officialUpdate');
   let officialUpdateBusy = false;
   officialUpdateBtn.onclick = async () => {
