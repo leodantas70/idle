@@ -4,10 +4,9 @@ if ! command -v npm >/dev/null 2>&1; then
   echo "O Node.js nao esta instalado. Baixe a versao LTS em https://nodejs.org"
   exit 1
 fi
-if [ ! -d node_modules ] || [ -f .update-needs-install ]; then
+if [ ! -d node_modules ]; then
   echo "Primeira vez: instalando o necessario. Isso pode levar alguns minutos..."
-  npm install || exit 1
-  rm -f .update-needs-install
+  npm install
 fi
 echo "Abrindo o PokeGrid..."
 # O erro do Electron precisa aparecer: descartar o stderr escondia a causa quando o app

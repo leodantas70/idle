@@ -496,7 +496,6 @@
         <button id="minTray" title="O que o botão minimizar faz: esconder na bandeja ou minimizar normal na barra de tarefas">📥 Minimiza p/ bandeja</button>
         <button id="autoStart" style="display:none" title="Cria um atalho na pasta Inicializar do Windows pra abrir o PokeGrid junto com o sistema">🚀 Abrir com o Windows</button>
         <button id="sndShiny" title="Toca um som quando um shiny aparece (além da notificação)">✨🔊 Som do shiny</button>
-        <button id="officialUpdate" title="Baixa atualizações do projeto oficial e preserva suas personalizações locais">⬇ Atualizar oficial</button>
         <button id="faqBtn" title="Perguntas frequentes: abre o FAQ no navegador">❓ FAQ</button> <button id="bkExp" title="Salva um arquivo com todas as configurações e o histórico (senhas ficam fora)">💾 Exportar config</button>
         <button id="bkImp" title="Restaura configurações e histórico de um arquivo exportado">📂 Importar config</button>
         <button id="layout">▦ Grade</button>
@@ -639,8 +638,7 @@ const HOME_URL  = 'https://poke.idleworld.online/?ref=CJNKGPB'; // link do refer
       cdToday:'Hoje', cdWeek:'7 dias', cdAllTime:'Total', goalG:'Meta gold/dia', goalC:'Meta capturas/dia', csvTitle:'Baixa o resumo por dia em CSV (planilha)', csvDia:'Dia', csvHunts:'Hunts', csvHuntsTitle:'Baixa duas planilhas: uma linha por hunt (tempo, kills/h, XP/h, capturas, gold) e uma linha por item dropado, com drop por kill pra calcular a porcentagem. O registro é automático: cada vez que você troca de hunt, a anterior entra no log.', cdLifeHint:'contadores: sessão · lista: histórico',
       cdTargets:'Alvos', cdCritIvQ:'IV × qual.', cdCritIv:'IV', cdCritQ:'Qualidade', cdBestCritTitle:'Critério do melhor catch. A qualidade multiplica os stats e o poder, então IV × qualidade reflete melhor a força real.', cdTargetsHint:'Sem alvos ainda: no modo Total, passe o mouse num card e clique na ★ para marcar', cdTargetsMark:'Marcar/desmarcar como alvo',
       whTitle:'Webhook do Discord: cole a URL do seu servidor pra receber avisos', whTest:'Testar', whShiny:'Avisar shiny', whSum:'Resumo diário', whDay:'📊 Resumo de', whCaught:'CAPTURADO ✅', whLost:'perdido ✕', whTestMsg:'✅ PokeGrid conectado! Os avisos vão chegar aqui.',
-      bkExp:'💾 Exportar config', bkImp:'📂 Importar config', bkExpTitle:'Salva um arquivo com todas as configurações e o histórico (senhas ficam fora)', bkImpTitle:'Restaura configurações e histórico de um arquivo exportado', bkConfirm:'Substituir as configurações atuais pelas do arquivo? O app vai recarregar. (Senhas não são afetadas.)', bkBad:'Arquivo inválido.',
-      upd:'⬇ Atualizar oficial', updTitle:'Baixa novidades do soufoka/PokeGrid-source, cria backup e preserva as personalizações locais', updBusy:'⏳ Atualizando…', updConfirm:'Buscar e mesclar a atualização oficial agora? Um backup será criado antes de qualquer alteração.', updRestart:'Feche completamente o PokeGrid e abra novamente para usar a atualização.'
+      bkExp:'💾 Exportar config', bkImp:'📂 Importar config', bkExpTitle:'Salva um arquivo com todas as configurações e o histórico (senhas ficam fora)', bkImpTitle:'Restaura configurações e histórico de um arquivo exportado', bkConfirm:'Substituir as configurações atuais pelas do arquivo? O app vai recarregar. (Senhas não são afetadas.)', bkBad:'Arquivo inválido.'
     },
     en: {
       loginAll:'▶ Log in all', accounts:'👤 Accounts', reloadAll:'⟳ Reload all', layout:'▦ Grid', layoutCol:'▤ Single column', propOn:'🖼 Original aspect', asOn:'🚀 Opens with Windows', asOff:'🚀 Open with Windows', asTitle:'Creates a PokeGrid shortcut in the Windows Startup folder, the same place you would put one by hand. It does not touch the registry and you can remove it via Win+R > shell:startup.', propOff:'🖼 Stretch to fill', propTitle:'Keeps the game original aspect ratio instead of stretching the image. Dark bars appear when the panel does not match the ratio; turned off, the image fills everything but gets distorted.', layoutRow:'▥ Single row', layoutTitle:'How the panels are arranged. Click to cycle: grid, single column (stacked) or single row (side by side).',
@@ -679,8 +677,7 @@ const HOME_URL  = 'https://poke.idleworld.online/?ref=CJNKGPB'; // link do refer
       cdToday:'Today', cdWeek:'7 days', cdAllTime:'All time', goalG:'Gold goal/day', goalC:'Catch goal/day', csvTitle:'Downloads the daily summary as a CSV (spreadsheet)', csvDia:'Day', csvHunts:'Hunts', csvHuntsTitle:'Downloads two spreadsheets: one row per hunt (time, kills/h, XP/h, captures, gold) and one row per dropped item, with drop per kill so you can work out the percentage. Logging is automatic: every time you switch hunts, the previous one is recorded.', cdLifeHint:'counters: session · list: all-time',
       cdTargets:'Targets', cdCritIvQ:'IV × qual.', cdCritIv:'IV', cdCritQ:'Quality', cdBestCritTitle:'Best-catch criterion. Quality multiplies stats and power, so IV × quality reflects real strength better.', cdTargetsHint:'No targets yet: in Total mode, hover a card and click the ★ to mark it', cdTargetsMark:'Mark/unmark as target',
       whTitle:'Discord webhook: paste your server URL to receive alerts', whTest:'Test', whShiny:'Shiny alerts', whSum:'Daily summary', whDay:'📊 Summary of', whCaught:'CAUGHT ✅', whLost:'lost ✕', whTestMsg:'✅ PokeGrid connected! Alerts will arrive here.',
-      bkExp:'💾 Export config', bkImp:'📂 Import config', bkExpTitle:'Saves a file with all settings and history (passwords stay out)', bkImpTitle:'Restores settings and history from an exported file', bkConfirm:'Replace the current settings with the file? The app will reload. (Passwords are not affected.)', bkBad:'Invalid file.',
-      upd:'⬇ Update official', updTitle:'Downloads changes from soufoka/PokeGrid-source, creates a backup and preserves local customizations', updBusy:'⏳ Updating…', updConfirm:'Download and merge the official update now? A backup will be created before any change.', updRestart:'Close PokeGrid completely and open it again to use the update.'
+      bkExp:'💾 Export config', bkImp:'📂 Import config', bkExpTitle:'Saves a file with all settings and history (passwords stay out)', bkImpTitle:'Restores settings and history from an exported file', bkConfirm:'Replace the current settings with the file? The app will reload. (Passwords are not affected.)', bkBad:'Invalid file.'
     },
     es: {
       loginAll:'▶ Iniciar equipo', accounts:'👤 Entrenadores', reloadAll:'⟳ Recargar todo', layout:'▦ Cuadrícula', layoutCol:'▤ Una columna', propOn:'🖼 Proporción original', asOn:'🚀 Abre con Windows', asOff:'🚀 Abrir con Windows', asTitle:'Crea un acceso directo de PokeGrid en la carpeta Inicio de Windows, el mismo lugar donde lo pondrías a mano. No toca el registro y puedes quitarlo con Win+R > shell:startup.', propOff:'🖼 Estirar en pantalla', propTitle:'Mantiene la proporción original del juego, sin estirar la imagen. Queda fondo oscuro cuando el panel no coincide con la proporción; apagado, la imagen llena todo pero se distorsiona.', layoutRow:'▥ Una fila', layoutTitle:'Cómo se organizan los paneles. Clic para alternar: cuadrícula, una columna (apilado) o una fila (lado a lado).',
@@ -719,8 +716,7 @@ const HOME_URL  = 'https://poke.idleworld.online/?ref=CJNKGPB'; // link do refer
       cdToday:'Hoy', cdWeek:'7 días', cdAllTime:'Total', goalG:'Meta oro/día', goalC:'Meta capturas/día', csvTitle:'Descarga el resumen por día en CSV (planilla)', csvDia:'Día', csvHunts:'Hunts', csvHuntsTitle:'Descarga dos planillas: una fila por hunt (tiempo, kills/h, XP/h, capturas, oro) y una fila por ítem dropeado, con drop por kill para calcular el porcentaje. El registro es automático: cada vez que cambias de hunt, la anterior queda guardada.', cdLifeHint:'contadores: sesión · lista: histórico',
       cdTargets:'Objetivos', cdCritIvQ:'IV × cal.', cdCritIv:'IV', cdCritQ:'Calidad', cdBestCritTitle:'Criterio del mejor catch. La calidad multiplica los stats y el poder, así que IV × calidad refleja mejor la fuerza real.', cdTargetsHint:'Sin objetivos aún: en modo Total, pasa el mouse por un card y haz clic en la ★ para marcarlo', cdTargetsMark:'Marcar/desmarcar como objetivo',
       whTitle:'Webhook de Discord: pega la URL de tu servidor para recibir avisos', whTest:'Probar', whShiny:'Avisar shiny', whSum:'Resumen diario', whDay:'📊 Resumen de', whCaught:'CAPTURADO ✅', whLost:'perdido ✕', whTestMsg:'✅ ¡PokeGrid conectado! Los avisos llegarán aquí.',
-      bkExp:'💾 Exportar config', bkImp:'📂 Importar config', bkExpTitle:'Guarda un archivo con todas las configuraciones y el historial (las contraseñas quedan fuera)', bkImpTitle:'Restaura configuraciones e historial desde un archivo exportado', bkConfirm:'¿Reemplazar las configuraciones actuales por las del archivo? La app se recargará. (Las contraseñas no se ven afectadas.)', bkBad:'Archivo inválido.',
-      upd:'⬇ Actualizar oficial', updTitle:'Descarga cambios de soufoka/PokeGrid-source, crea una copia y conserva las personalizaciones locales', updBusy:'⏳ Actualizando…', updConfirm:'¿Descargar y combinar la actualización oficial ahora? Se creará una copia antes de cualquier cambio.', updRestart:'Cierra PokeGrid por completo y ábrelo de nuevo para usar la actualización.'
+      bkExp:'💾 Exportar config', bkImp:'📂 Importar config', bkExpTitle:'Guarda un archivo con todas las configuraciones y el historial (las contraseñas quedan fuera)', bkImpTitle:'Restaura configuraciones e historial desde un archivo exportado', bkConfirm:'¿Reemplazar las configuraciones actuales por las del archivo? La app se recargará. (Las contraseñas no se ven afectadas.)', bkBad:'Archivo inválido.'
     }
   };
   let lang = ['en', 'es'].includes(lsGet('lang')) ? lsGet('lang') : 'pt';
@@ -1677,7 +1673,6 @@ return {live,hasBalls,hasInv,balls,potions,revives,prevHunt:resumo(P.prev),shiny
     const be = document.getElementById('bkExp'); be.textContent = t('bkExp'); be.title = t('bkExpTitle');
     const bi = document.getElementById('bkImp'); bi.textContent = t('bkImp'); bi.title = t('bkImpTitle');
     const fq = document.getElementById('faqBtn'); fq.textContent = t('faq'); fq.title = t('faqTitle');
-    const up = document.getElementById('officialUpdate'); up.textContent = t('upd'); up.title = t('updTitle');
     langBtns.forEach(b => b.classList.toggle('on', b.dataset.lang === lang));
     refBtn.title = t('refTitle');
     awakeBtn.title = t('awakeTitle');
@@ -1743,29 +1738,6 @@ return {live,hasBalls,hasInv,balls,potions,revives,prevHunt:resumo(P.prev),shiny
   };
   document.getElementById('reloadAll').onclick = () => webviews.forEach((w, i) => { if (!off[i]) w.reload(); });
   document.getElementById('faqBtn').onclick = () => window.open('https://github.com/soufoka/PokeGrid-source/blob/main/FAQ.md');
-  const officialUpdateBtn = document.getElementById('officialUpdate');
-  let officialUpdateBusy = false;
-  officialUpdateBtn.onclick = async () => {
-    if (officialUpdateBusy || !window.confirm(t('updConfirm'))) return;
-    officialUpdateBusy = true;
-    officialUpdateBtn.disabled = true;
-    officialUpdateBtn.textContent = t('updBusy');
-    document.getElementById('menu').classList.remove('show');
-    try {
-      const r = await window.pokeAPI.applyOfficialUpdate();
-      let msg = (r && r.message) || 'A atualização não respondeu.';
-      if (r && r.files && r.files.length) msg += '\n\nArquivos: ' + r.files.slice(0, 15).join(', ') + (r.files.length > 15 ? '…' : '');
-      if (r && r.backup) msg += '\n\nBackup: ' + r.backup;
-      if (r && r.ok && r.updated) msg += '\n\n' + t('updRestart') + (r.needsInstall ? '\nAs dependências serão instaladas ao abrir pelo atalho.' : '');
-      window.alert(msg);
-    } catch (e) {
-      window.alert('Não foi possível executar a atualização: ' + ((e && e.message) || e));
-    } finally {
-      officialUpdateBusy = false;
-      officialUpdateBtn.disabled = false;
-      officialUpdateBtn.textContent = t('upd');
-    }
-  };
   // Layout dos paineis: grade (2x2) -> coluna (vertical) -> linha (horizontal)
   let layoutMode = lsGet('layout') || 'grid';
   function applyLayout() {

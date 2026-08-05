@@ -2,7 +2,6 @@ const { app, BrowserWindow, ipcMain, safeStorage, Tray, Menu, powerSaveBlocker, 
 const path = require('path');
 const fs = require('fs');
 const https = require('https'); // so pro webhook opcional do Discord
-const { applyOfficialUpdate } = require('./src/updater');
 
 // Silencia o spam do Chromium no terminal (ex.: STUN/WebRTC do jogo que a rede nao resolve).
 // E so log, nao afeta o app. Mantem so erros fatais.
@@ -39,26 +38,6 @@ ipcMain.handle('errlog:open', () => {
     if (!fs.existsSync(errFile())) fs.writeFileSync(errFile(), 'Nenhum erro registrado ate agora. / No errors recorded yet.\n');
     shell.showItemInFolder(errFile());
   } catch {}
-});
-
-// Atualiza somente a versão que roda pelo código. O motor cria backup, salva as mudanças locais
-// num histórico Git que fica apenas neste PC, baixa o soufoka/PokeGrid-source e tenta uma mesclagem
-// de três versões. Não existe comando de push: nenhuma personalização é enviada para o GitHub.
-let officialUpdateRunning = false;
-ipcMain.handle('updater:apply', async () => {
-  if (officialUpdateRunning) return { ok:false, kind:'busy', message:'Uma atualização já está em andamento.' };
-  if (app.isPackaged) return { ok:false, kind:'packaged', message:'Este botão funciona somente na versão que roda pelo código.' };
-  officialUpdateRunning = true;
-  try {
-    const result = await applyOfficialUpdate({
-      projectRoot: app.getAppPath(),
-      backupRoot: path.join(app.getPath('userData'), 'backups-atualizacao')
-    });
-    logErro('atualizador', (result.ok ? 'ok' : 'falhou') + ': ' + result.message + (result.files && result.files.length ? ' [' + result.files.join(', ') + ']' : ''));
-    return result;
-  } finally {
-    officialUpdateRunning = false;
-  }
 });
 
 // Instancia unica: abrir o app de novo so foca a janela ja aberta.
