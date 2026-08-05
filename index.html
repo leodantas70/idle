@@ -29,8 +29,6 @@
   button.primary:hover { background: #f0491f; }
   button.on { background: #238636; border-color: #238636; }
   #refBtn { margin-left: 14px; }
-  #donTop { margin-right: auto; margin-left: 12px; padding: 4px 12px; font-size: 12px; font-weight: 600; background: #1f6f3d; border: 1px solid #2ea043; color: #fff; }
-  #donTop:hover { background: #278a4b; border-color: #3fb950; }
   /* pílula IV's: mesmo visual do botão da extensão dentro do jogo */
   #ivsBtn { display: inline-flex; align-items: center; gap: 6px; background: linear-gradient(135deg, #e3350d, #b91c1c); border-color: #8f1408; border-radius: 999px; color: #fff; font-weight: 700; }
   #ivsBtn:hover { background: linear-gradient(135deg, #f0491f, #d42020); border-color: #e3350d; }
@@ -515,7 +513,6 @@
       POKEGRID
       <span class="ver" id="appVer"></span>
     </span>
-    <button id="donTop">Ajude o projeto</button>
     <button id="loginAll" class="primary">▶ Logar equipe</button>
     <button id="accounts">👤 Treinadores</button>
     <button id="reloadAll">⟳ Atualizar tudo</button>
@@ -540,7 +537,7 @@
         <button id="minTray" title="O que o botão minimizar faz: esconder na bandeja ou minimizar normal na barra de tarefas">📥 Minimiza p/ bandeja</button>
         <button id="autoStart" style="display:none" title="Cria um atalho na pasta Inicializar do Windows pra abrir o PokeGrid junto com o sistema">🚀 Abrir com o Windows</button>
         <button id="sndShiny" title="Toca um som quando um shiny aparece (além da notificação)">✨🔊 Som do shiny</button>
-        <button id="officialUpdate" title="Baixa atualizações do projeto oficial e preserva suas personalizações locais">⬇ Atualizar oficial</button>
+        <button id="officialUpdate" title="Baixa atualizações do seu repositório e preserva suas personalizações locais">⬇ Atualizar versão Leo</button>
         <button id="faqBtn" title="Perguntas frequentes: abre o FAQ no navegador">❓ FAQ</button> <button id="bkExp" title="Salva um arquivo com todas as configurações e o histórico (senhas ficam fora)">💾 Exportar config</button>
         <button id="bkImp" title="Restaura configurações e histórico de um arquivo exportado">📂 Importar config</button>
         <button id="layout">▦ Grade</button>
@@ -700,7 +697,7 @@ const HOME_URL  = 'https://poke.idleworld.online/?ref=CJNKGPB'; // link do refer
       cdTargets:'Alvos', cdCritIvQ:'IV × qual.', cdCritIv:'IV', cdCritQ:'Qualidade', cdBestCritTitle:'Critério do melhor catch. A qualidade multiplica os stats e o poder, então IV × qualidade reflete melhor a força real.', cdTargetsHint:'Sem alvos ainda: no modo Total, passe o mouse num card e clique na ★ para marcar', cdTargetsMark:'Marcar/desmarcar como alvo',
       whTitle:'Webhook do Discord: cole a URL do seu servidor pra receber avisos', whTest:'Testar', whShiny:'Avisar shiny', whSum:'Resumo diário', whDay:'📊 Resumo de', whCaught:'CAPTURADO ✅', whLost:'perdido ✕', whTestMsg:'✅ PokeGrid conectado! Os avisos vão chegar aqui.',
       bkExp:'💾 Exportar config', bkImp:'📂 Importar config', bkExpTitle:'Salva um arquivo com todas as configurações e o histórico (senhas ficam fora)', bkImpTitle:'Restaura configurações e histórico de um arquivo exportado', bkConfirm:'Substituir as configurações atuais pelas do arquivo? O app vai recarregar. (Senhas não são afetadas.)', bkBad:'Arquivo inválido.',
-      upd:'⬇ Atualizar oficial', updTitle:'Baixa novidades do soufoka/PokeGrid-source, cria backup e preserva as personalizações locais', updBusy:'⏳ Atualizando…', updConfirm:'Buscar e mesclar a atualização oficial agora? Um backup será criado antes de qualquer alteração.', updRestart:'Feche completamente o PokeGrid e abra novamente para usar a atualização.'
+      upd:'⬇ Atualizar versão Leo', updTitle:'Baixa novidades de leodantas70/idle, cria backup e preserva as personalizações locais', updBusy:'⏳ Atualizando…', updConfirm:'Buscar e mesclar a atualização do seu repositório agora? Um backup será criado antes de qualquer alteração.', updRestart:'Feche completamente o PokeGrid e abra novamente para usar a atualização.'
     },
     en: {
       loginAll:'▶ Log in all', accounts:'👤 Accounts', reloadAll:'⟳ Reload all', layout:'▦ Grid', layoutCol:'▤ Single column', propOn:'🖼 Original aspect', asOn:'🚀 Opens with Windows', asOff:'🚀 Open with Windows', asTitle:'Creates a PokeGrid shortcut in the Windows Startup folder, the same place you would put one by hand. It does not touch the registry and you can remove it via Win+R > shell:startup.', propOff:'🖼 Stretch to fill', propTitle:'Keeps the game original aspect ratio instead of stretching the image. Dark bars appear when the panel does not match the ratio; turned off, the image fills everything but gets distorted.', layoutRow:'▥ Single row', layoutTitle:'How the panels are arranged. Click to cycle: grid, single column (stacked) or single row (side by side).',
@@ -740,7 +737,7 @@ const HOME_URL  = 'https://poke.idleworld.online/?ref=CJNKGPB'; // link do refer
       cdTargets:'Targets', cdCritIvQ:'IV × qual.', cdCritIv:'IV', cdCritQ:'Quality', cdBestCritTitle:'Best-catch criterion. Quality multiplies stats and power, so IV × quality reflects real strength better.', cdTargetsHint:'No targets yet: in Total mode, hover a card and click the ★ to mark it', cdTargetsMark:'Mark/unmark as target',
       whTitle:'Discord webhook: paste your server URL to receive alerts', whTest:'Test', whShiny:'Shiny alerts', whSum:'Daily summary', whDay:'📊 Summary of', whCaught:'CAUGHT ✅', whLost:'lost ✕', whTestMsg:'✅ PokeGrid connected! Alerts will arrive here.',
       bkExp:'💾 Export config', bkImp:'📂 Import config', bkExpTitle:'Saves a file with all settings and history (passwords stay out)', bkImpTitle:'Restores settings and history from an exported file', bkConfirm:'Replace the current settings with the file? The app will reload. (Passwords are not affected.)', bkBad:'Invalid file.',
-      upd:'⬇ Update official', updTitle:'Downloads changes from soufoka/PokeGrid-source, creates a backup and preserves local customizations', updBusy:'⏳ Updating…', updConfirm:'Download and merge the official update now? A backup will be created before any change.', updRestart:'Close PokeGrid completely and open it again to use the update.'
+      upd:'⬇ Update Leo version', updTitle:'Downloads changes from leodantas70/idle, creates a backup and preserves local customizations', updBusy:'⏳ Updating…', updConfirm:'Download and merge the update from your repository now? A backup will be created before any change.', updRestart:'Close PokeGrid completely and open it again to use the update.'
     },
     es: {
       loginAll:'▶ Iniciar equipo', accounts:'👤 Entrenadores', reloadAll:'⟳ Recargar todo', layout:'▦ Cuadrícula', layoutCol:'▤ Una columna', propOn:'🖼 Proporción original', asOn:'🚀 Abre con Windows', asOff:'🚀 Abrir con Windows', asTitle:'Crea un acceso directo de PokeGrid en la carpeta Inicio de Windows, el mismo lugar donde lo pondrías a mano. No toca el registro y puedes quitarlo con Win+R > shell:startup.', propOff:'🖼 Estirar en pantalla', propTitle:'Mantiene la proporción original del juego, sin estirar la imagen. Queda fondo oscuro cuando el panel no coincide con la proporción; apagado, la imagen llena todo pero se distorsiona.', layoutRow:'▥ Una fila', layoutTitle:'Cómo se organizan los paneles. Clic para alternar: cuadrícula, una columna (apilado) o una fila (lado a lado).',
@@ -780,7 +777,7 @@ const HOME_URL  = 'https://poke.idleworld.online/?ref=CJNKGPB'; // link do refer
       cdTargets:'Objetivos', cdCritIvQ:'IV × cal.', cdCritIv:'IV', cdCritQ:'Calidad', cdBestCritTitle:'Criterio del mejor catch. La calidad multiplica los stats y el poder, así que IV × calidad refleja mejor la fuerza real.', cdTargetsHint:'Sin objetivos aún: en modo Total, pasa el mouse por un card y haz clic en la ★ para marcarlo', cdTargetsMark:'Marcar/desmarcar como objetivo',
       whTitle:'Webhook de Discord: pega la URL de tu servidor para recibir avisos', whTest:'Probar', whShiny:'Avisar shiny', whSum:'Resumen diario', whDay:'📊 Resumen de', whCaught:'CAPTURADO ✅', whLost:'perdido ✕', whTestMsg:'✅ ¡PokeGrid conectado! Los avisos llegarán aquí.',
       bkExp:'💾 Exportar config', bkImp:'📂 Importar config', bkExpTitle:'Guarda un archivo con todas las configuraciones y el historial (las contraseñas quedan fuera)', bkImpTitle:'Restaura configuraciones e historial desde un archivo exportado', bkConfirm:'¿Reemplazar las configuraciones actuales por las del archivo? La app se recargará. (Las contraseñas no se ven afectadas.)', bkBad:'Archivo inválido.',
-      upd:'⬇ Actualizar oficial', updTitle:'Descarga cambios de soufoka/PokeGrid-source, crea una copia y conserva las personalizaciones locales', updBusy:'⏳ Actualizando…', updConfirm:'¿Descargar y combinar la actualización oficial ahora? Se creará una copia antes de cualquier cambio.', updRestart:'Cierra PokeGrid por completo y ábrelo de nuevo para usar la actualización.'
+      upd:'⬇ Actualizar versión Leo', updTitle:'Descarga cambios de leodantas70/idle, crea una copia y conserva las personalizaciones locales', updBusy:'⏳ Actualizando…', updConfirm:'¿Descargar y combinar la actualización de tu repositorio ahora? Se creará una copia antes de cualquier cambio.', updRestart:'Cierra PokeGrid por completo y ábrelo de nuevo para usar la actualización.'
     }
   };
   let lang = ['en', 'es'].includes(lsGet('lang')) ? lsGet('lang') : 'pt';
@@ -1816,7 +1813,6 @@ return {live,hasBalls,hasInv,balls,potions,revives,prevHunt:resumo(P.prev),shiny
     const bi = document.getElementById('bkImp'); bi.textContent = t('bkImp'); bi.title = t('bkImpTitle');
     const fq = document.getElementById('faqBtn'); fq.textContent = t('faq'); fq.title = t('faqTitle');
     const up = document.getElementById('officialUpdate'); up.textContent = t('upd'); up.title = t('updTitle');
-    donTop.textContent = t('donTitle'); donTop.title = t('donText');
     langBtns.forEach(b => b.classList.toggle('on', b.dataset.lang === lang));
     refBtn.title = t('refTitle');
     awakeBtn.title = t('awakeTitle');
@@ -1882,7 +1878,7 @@ return {live,hasBalls,hasInv,balls,potions,revives,prevHunt:resumo(P.prev),shiny
     setTimeout(() => { refBtn.textContent = '🔗'; }, 1500);
   };
   document.getElementById('reloadAll').onclick = () => webviews.forEach((w, i) => { if (!off[i]) w.reload(); });
-  document.getElementById('faqBtn').onclick = () => window.open('https://github.com/soufoka/PokeGrid-source/blob/main/FAQ.md');
+  document.getElementById('faqBtn').onclick = () => window.open('https://github.com/leodantas70/idle/blob/master/FAQ.md');
   const officialUpdateBtn = document.getElementById('officialUpdate');
   let officialUpdateBusy = false;
   officialUpdateBtn.onclick = async () => {
@@ -1907,8 +1903,6 @@ return {live,hasBalls,hasInv,balls,potions,revives,prevHunt:resumo(P.prev),shiny
       officialUpdateBtn.textContent = t('upd');
     }
   };
-  const donTop = document.getElementById('donTop');
-  donTop.onclick = () => window.open('https://link.mercadopago.com.br/pokegrid');
   // versao aberta, lida da propria UA (o Electron poe PokeGrid/x.y.z nela; zero IPC)
   try {
     const vAtual = (navigator.userAgent.match(/PokeGrid\/([\d.]+)/) || [])[1];
@@ -1925,13 +1919,13 @@ return {live,hasBalls,hasInv,balls,potions,revives,prevHunt:resumo(P.prev),shiny
       a2.id = 'appVerNew'; a2.textContent = ' \u2192 v' + limpa;
       a2.style.cssText = 'color:#f2c665;cursor:pointer';
       a2.title = t('verNova');
-      a2.onclick = () => window.open('https://github.com/soufoka/PokeGrid-source');
+      a2.onclick = () => window.open('https://github.com/leodantas70/idle');
       elVer.appendChild(a2);
     };
     const cacheV = lsObj('verNova');
     if (cacheV.tag) vMostra(cacheV.tag);
     if (vAtual && Date.now() - (+cacheV.t || 0) > 22 * 3600e3) setTimeout(() => {
-      fetch('https://api.github.com/repos/soufoka/PokeGrid/releases/latest').then(r => r.json()).then(j => {
+      fetch('https://api.github.com/repos/leodantas70/idle/releases/latest').then(r => r.json()).then(j => {
         const tag = j && typeof j.tag_name === 'string' ? j.tag_name : '';
         lsSet('verNova', JSON.stringify({ t: Date.now(), tag: /^v?[\d.]{1,12}$/.test(tag) ? tag : '' }));
         vMostra(tag);

@@ -7,7 +7,7 @@
 
 ## 1.5.14
 
-- **💚 Ajude o projeto**: card discreto no fim do Painel com o link oficial de apoio (https://link.mercadopago.com.br/pokegrid, Pix e cartão). Opcional, não desbloqueia nada; o app segue gratuito. E a lista do time agora mostra a **EXP %** de cada pokémon junto do HP, como no card do jogo.
+- A lista do time mostra a **EXP %** de cada pokémon junto do HP, como no card do jogo.
   *Support-the-project card at the end of the Panel with the official donation link (optional, unlocks nothing), and the team list now shows each pokémons EXP % next to HP.*
 - **Atalhos de teclado** (PR do israeltduarte): H abre o Hunt Analyzer, L o Limpar jogo, C o Simples, E o Eco, A os Alertas, R atualiza tudo, T os Treinadores, M o menu do jogo, G a Tierlist e O as Opções. Só valem com o foco na interface: enquanto você digita em qualquer campo, ou com o jogo focado, as teclas não fazem nada.
   *Keyboard shortcuts (PR by israeltduarte), active only when the app interface has focus.*

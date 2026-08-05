@@ -38,7 +38,7 @@ Download the LTS version at [nodejs.org](https://nodejs.org) and install it (jus
 Click the green **Code** button above, then **Download ZIP**. Extract the folder wherever you want. If you use Git, clone it:
 
 ```bash
-git clone https://github.com/soufoka/PokeGrid-source.git
+git clone https://github.com/leodantas70/idle.git
 ```
 
 **3. Open the app**

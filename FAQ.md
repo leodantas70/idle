@@ -9,7 +9,7 @@ Não. Tudo fica em `%APPDATA%\pokegrid`, fora do programa. Atualizar, reinstalar
 Não. Backup = copiar a pasta `%APPDATA%\pokegrid`. Só as senhas não migram pra outro PC (são criptografadas pelo Windows); o resto vai junto.
 
 ### O processo abre mas a janela não aparece
-Bug das versões 1.5.5 a 1.5.9, corrigido na **1.5.10**. Baixe a mais recente: https://github.com/soufoka/PokeGrid-source
+Bug das versões 1.5.5 a 1.5.9, corrigido na **1.5.10**. Baixe a mais recente: https://github.com/leodantas70/idle
 
 ### Qual navegador o app usa?
 Electron (Chromium, o motor do Chrome). Cada conta roda numa sessão separada.
@@ -40,8 +40,8 @@ Com o escudo ligado, o app pede confirmação antes de vender shiny, qualidade L
 ## Projeto
 
 ### Como apoio o projeto?
-Pelo botão **Ajude o projeto** ao lado do logo, no topo do app, ou direto em https://link.mercadopago.com.br/pokegrid (Pix e cartão). Apoio é opcional e não desbloqueia nada; o app é e continua gratuito. **Esse é o único link oficial**: desconfie de qualquer outro.
+Esta versão pessoal não possui botão de doação ou link de pagamento.
 
 
 ### Como contribuo?
-Fork de https://github.com/soufoka/PokeGrid-source, rode `npm test` e abra o PR. A `main` é protegida, tudo entra por PR.
+Use https://github.com/leodantas70/idle, rode `npm test` e envie as alterações para o seu repositório.
