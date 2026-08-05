@@ -115,6 +115,8 @@ ok(index.includes('orreXpMul') && index.includes('depColeta()') && index.include
 ok(index.includes('num(p&&p.ivTotal)') && index.includes('nL(p.ivTotal)'), 'formato novo de IV e qualidade funciona nos paineis e na venda personalizada');
 ok(index.includes('id="stFavoriteHunt"') && index.includes('id="stFavoriteTp"') && index.includes('class="st-fav-row"'), 'painel individual mostra favorito e Dar TP na mesma linha');
 ok(index.includes("localStorage.setItem('favoritePokeHunts'") && index.includes('favoritePokeHunts[favoriteCid]') && index.includes('goToRecentHunt(statsIdx, chosenFavorite.slug'), 'favorito fica salvo por personagem e reutiliza o teleporte');
+ok(index.includes('data-catch-alert=') && index.includes("lsSet('catchAlerts'") && index.includes('avisaCaptura(i, r, x)'), 'alerta de captura fica na Sessao, salvo e ligado apenas a capturas novas');
+ok(index.includes("window.pokeAPI.notify('PokeGrid', acc + ' ' + t('msgCatch')") && index.includes('function beepCapture()'), 'alerta de captura toca som e envia notificacao com o Pokemon');
 
 try { fs.rmSync(path.join(RAIZ, '.teste-tmp'), { recursive: true, force: true }); } catch {}
 console.log(falhas ? '\n' + falhas + ' falha(s)' : '\nInicializacao: tudo certo');
