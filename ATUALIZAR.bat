@@ -4,7 +4,8 @@ setlocal EnableExtensions
 if /i "%~1"=="--executar-temp" goto :atualizar
 
 rem Executa uma copia temporaria para o proprio ATUALIZAR.bat poder ser substituido.
-set "PG_ALVO=%~dp0"
+rem O ponto remove a barra final, evitando que ela prenda a aspas ao chamar a copia.
+for %%I in ("%~dp0.") do set "PG_ALVO=%%~fI"
 set "PG_RUNNER=%TEMP%\pokegrid-leo-atualizar-%RANDOM%-%RANDOM%.bat"
 copy /y "%~f0" "%PG_RUNNER%" >nul
 if errorlevel 1 (
@@ -19,7 +20,7 @@ exit /b %PG_RESULTADO%
 
 :atualizar
 title Atualizar PokeGrid Leo
-set "PG_ALVO=%~2"
+for %%I in ("%~2\.") do set "PG_ALVO=%%~fI"
 cd /d "%PG_ALVO%"
 
 echo ========================================
