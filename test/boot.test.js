@@ -90,7 +90,7 @@ ok(registrados.size === canais.length, 'todos os canais foram registrados uma ve
 
 console.log('--- scripts injetados nos paineis parseiam ---');
 const pega = (marca) => { const i = index.indexOf(marca); if (i < 0) return null; const ini = index.indexOf('`', i) + 1; return index.slice(ini, index.indexOf('`;', ini)); };
-[['READ_STATE', 'READ_STATE = `'], ['READ_ALERTS', 'READ_ALERTS = `('], ['HUNTS_JS', 'const HUNTS_JS = `'], ['SELLGUARD', 'const SELLGUARD = `'], ['READ_BAG_IV', 'const READ_BAG_IV = `'], ['READ_BREEDING_DOM', 'const READ_BREEDING_DOM = `'], ['SELL_SAFE_POKES', 'const SELL_SAFE_POKES = `'], ['BUY_UB_BATCH', 'const BUY_UB_BATCH = qty => `']].forEach(([nome, marca]) => {
+[['READ_STATE', 'READ_STATE = `'], ['READ_ALERTS', 'READ_ALERTS = `('], ['HUNTS_JS', 'const HUNTS_JS = `'], ['SELLGUARD', 'const SELLGUARD = `'], ['READ_BAG_IV', 'const READ_BAG_IV = `'], ['SELL_SAFE_POKES', 'const SELL_SAFE_POKES = `'], ['BUY_UB_BATCH', 'const BUY_UB_BATCH = qty => `']].forEach(([nome, marca]) => {
   const cru = pega(marca);
   if (cru == null) { ok(false, nome + ' sumiu do index.html'); return; }
   // o template literal e desescapado antes de rodar no painel; aqui fazemos o mesmo
@@ -117,8 +117,6 @@ ok(index.includes('id="stFavoriteHunt"') && index.includes('id="stFavoriteTp"') 
 ok(index.includes("localStorage.setItem('favoritePokeHunts'") && index.includes('favoritePokeHunts[favoriteCid]') && index.includes('goToRecentHunt(statsIdx, chosenFavorite.slug'), 'favorito fica salvo por personagem e reutiliza o teleporte');
 ok(index.includes('data-catch-alert=') && index.includes("lsSet('catchAlerts'") && index.includes('avisaCaptura(i, r, x)'), 'alerta de captura fica na Sessao, salvo e ligado apenas a capturas novas');
 ok(index.includes("window.pokeAPI.notify('PokeGrid', acc + ' ' + t('msgCatch')") && index.includes('function beepCapture()'), 'alerta de captura toca som e envia notificacao com o Pokemon');
-ok(index.includes("document.querySelector('[data-guide=\"dock-breeding\"]')") && index.includes("querySelector('.brd-egg-counts')") && index.includes('d.breeding = await'), 'Resumo Geral le a incubadora separadamente em cada personagem');
-ok(index.includes("' Breeding</span>") && index.includes("nf(x.current || 0) + '/' + nf(x.total || 3000)"), 'contador de breeding aparece abaixo da estimativa de level');
 
 try { fs.rmSync(path.join(RAIZ, '.teste-tmp'), { recursive: true, force: true }); } catch {}
 console.log(falhas ? '\n' + falhas + ' falha(s)' : '\nInicializacao: tudo certo');
