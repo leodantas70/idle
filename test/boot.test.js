@@ -113,6 +113,8 @@ ok(index.includes('class="st-buy-ub-all"') && index.includes('[1000, 5000, 10000
 ok(index.includes('id="officialUpdate"') && main.includes("'updater:apply'") && preload.includes('applyOfficialUpdate'), 'atualizador oficial continua acessivel');
 ok(index.includes('orreXpMul') && index.includes('depColeta()') && index.includes('id="tierBtn"'), 'recursos oficiais 1.5.15 de Orre, depot e tierlist permanecem');
 ok(index.includes('num(p&&p.ivTotal)') && index.includes('nL(p.ivTotal)'), 'formato novo de IV e qualidade funciona nos paineis e na venda personalizada');
+ok(index.includes('id="stFavoriteHunt"') && index.includes('id="stFavoriteTp"') && index.includes('class="st-fav-row"'), 'painel individual mostra favorito e Dar TP na mesma linha');
+ok(index.includes("localStorage.setItem('favoritePokeHunts'") && index.includes('favoritePokeHunts[favoriteCid]') && index.includes('goToRecentHunt(statsIdx, chosenFavorite.slug'), 'favorito fica salvo por personagem e reutiliza o teleporte');
 
 try { fs.rmSync(path.join(RAIZ, '.teste-tmp'), { recursive: true, force: true }); } catch {}
 console.log(falhas ? '\n' + falhas + ' falha(s)' : '\nInicializacao: tudo certo');

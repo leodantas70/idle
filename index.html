@@ -485,6 +485,13 @@
   #stats .cfg-isub { padding: 7px 6px 2px; font-size: 9.5px; color: #7d8590; text-transform: uppercase; letter-spacing: .05em; font-weight: 600; }
   #stats .cfg-credit { padding: 2px 15px 4px; font-size: 11px; color: #6e7681; line-height: 1.6; }
   #stats .cfg-credit b { color: #adbac7; font-weight: 600; }
+  #stats .st-fav-box { margin-top: 8px; padding: 8px; border: 1px solid #30363d; border-radius: 7px; background: #12171e; }
+  #stats .st-fav-title { margin-bottom: 6px; color: #f2c665; font-size: 11px; font-weight: 700; }
+  #stats .st-fav-row { display: flex; align-items: center; gap: 7px; }
+  #stats .st-fav-select { flex: 1; min-width: 0; padding: 7px 8px; border: 1px solid #30363d; border-radius: 6px; background: #0d1117; color: #e6edf3; font-size: 11px; }
+  #stats .st-fav-select:focus { outline: none; border-color: #388bfd; }
+  #stats .st-fav-go { flex: none; padding: 7px 10px; border: 1px solid #388bfd; border-radius: 6px; background: #13233a; color: #79c0ff; font-size: 11px; font-weight: 700; cursor: pointer; white-space: nowrap; }
+  #stats .st-fav-go:disabled, #stats .st-fav-select:disabled { cursor: default; opacity: .45; }
   /* comparação com a hunt anterior */
   #stats .cmp { display: grid; grid-template-columns: 1fr .9fr .9fr; gap: 6px; padding: 4px 15px; font-size: 12.5px; align-items: center; }
   #stats .cmp .cl { color: #8b949e; }
@@ -2267,6 +2274,13 @@ return {live,hasBalls,hasInv,balls,potions,revives,prevHunt:resumo(P.prev),shiny
     cfg.order.forEach(name => { if (cfg.hide[name]) return; const fn = B[name]; if (!fn) return; const html = fn(d, a); if (html) h += '<div class="dsect" data-sec="' + name + '" draggable="true"><span class="dgrip" title="' + t('stDragHint') + '">⋮⋮</span><span class="dhide" data-sec="' + name + '" title="' + t('stHideSec') + '">✕</span>' + html + '</div>'; });
     rememberHunt(d.cid || '', d.huntSlug || '', d.hunt || '');
     const lastHunt = (recentHunts[d.cid] || []).find(x => x && x.slug && x.slug !== d.huntSlug);
+    carregaHunts();
+    const favoriteCid = String(d.cid || '').slice(0, 80);
+    const favoriteList = favoriteHuntList();
+    const favoriteSaved = favoriteCid && favoritePokeHunts[favoriteCid] && typeof favoritePokeHunts[favoriteCid] === 'object' ? favoritePokeHunts[favoriteCid] : null;
+    const favoriteCurrent = favoriteList.find(x => favoriteSaved && String(x.slug || '').toLowerCase() === String(favoriteSaved.slug || '').toLowerCase()) || null;
+    const favoritePlaceholder = huntsCache ? 'Selecione um Pokémon…' : 'Carregando Pokémon…';
+    const favoriteOptions = '<option value="">' + favoritePlaceholder + '</option>' + favoriteList.map(x => '<option value="' + esc(x.slug) + '"' + (favoriteCurrent === x ? ' selected' : '') + '>' + esc(x.name || x.slug) + (+x.level ? ' · Lv ' + nf(x.level) : '') + (String(x.ar || '').toLowerCase() === 'orre' ? ' · ORRE' : '') + '</option>').join('');
     h += '<div style="padding:12px 14px 8px;border-top:1px solid #30363d;margin-top:12px">'
       + '<div style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:7px">'
       + '<button id="stOpenMarket" style="padding:8px 5px;border:1px solid #30363d;border-radius:7px;background:#161b22;color:#e6edf3;cursor:pointer">🏪 Abrir Market</button>'
@@ -2276,7 +2290,11 @@ return {live,hasBalls,hasInv,balls,potions,revives,prevHunt:resumo(P.prev),shiny
       + '</div></div>'
       + '<div style="padding:0 14px 16px">'
       + '<button id="stBackLastHunt" style="width:100%;padding:9px;border:1px solid #388bfd;border-radius:7px;background:#13233a;color:#79c0ff;font-weight:700;cursor:pointer"'
-      + (lastHunt ? '' : ' disabled') + '>↩ Voltar para última hunt</button></div>';
+      + (lastHunt ? '' : ' disabled') + '>↩ Voltar para última hunt</button>'
+      + '<div class="st-fav-box"><div class="st-fav-title">⭐ Favorito</div><div class="st-fav-row">'
+      + '<select id="stFavoriteHunt" class="st-fav-select" title="Selecione um Pokémon para salvar como favorito"' + ((!favoriteCid || !favoriteList.length) ? ' disabled' : '') + '>' + favoriteOptions + '</select>'
+      + '<button id="stFavoriteTp" class="st-fav-go"' + (favoriteCurrent ? '' : ' disabled') + '>Dar TP</button>'
+      + '</div></div></div>';
     stBody.innerHTML = h;
     const market = stBody.querySelector('#stOpenMarket'); if (market) market.onclick = () => openCharacterMarket(statsIdx);
     const depot = stBody.querySelector('#stOpenDepot'); if (depot) depot.onclick = () => openCharacterDepot(statsIdx);
@@ -2290,6 +2308,28 @@ return {live,hasBalls,hasInv,balls,potions,revives,prevHunt:resumo(P.prev),shiny
     if (back && lastHunt) back.onclick = () => {
       back.disabled = true; back.textContent = 'Enviando…';
       goToRecentHunt(statsIdx, lastHunt.slug, lastHunt.name || lastHunt.slug);
+    };
+    const favoriteSelect = stBody.querySelector('#stFavoriteHunt');
+    const favoriteTp = stBody.querySelector('#stFavoriteTp');
+    let chosenFavorite = favoriteCurrent;
+    if (favoriteSelect) favoriteSelect.onchange = () => {
+      const slug = String(favoriteSelect.value || '').toLowerCase();
+      chosenFavorite = favoriteList.find(x => String(x.slug || '').toLowerCase() === slug) || null;
+      if (favoriteCid) {
+        if (chosenFavorite) favoritePokeHunts[favoriteCid] = { slug:String(chosenFavorite.slug || '').slice(0, 120), name:String(chosenFavorite.name || chosenFavorite.slug || '').slice(0, 80) };
+        else delete favoritePokeHunts[favoriteCid];
+        saveFavoritePokeHunts();
+      }
+      if (favoriteTp) {
+        favoriteTp.disabled = !chosenFavorite;
+        favoriteTp.title = chosenFavorite ? 'Ir para ' + String(chosenFavorite.name || chosenFavorite.slug || '') : '';
+      }
+      favoriteSelect.blur();
+    };
+    if (favoriteTp) favoriteTp.onclick = () => {
+      if (!chosenFavorite) return;
+      favoriteTp.disabled = true; favoriteTp.textContent = 'Enviando…';
+      goToRecentHunt(statsIdx, chosenFavorite.slug, chosenFavorite.name || chosenFavorite.slug);
     };
     wireSectionDrag();
     stBody.querySelectorAll('.dhide').forEach(el => el.onclick = (e) => { e.stopPropagation(); cfg.hide[el.dataset.sec] = true; saveStatsCfg(); refreshStats(); });
@@ -2463,6 +2503,8 @@ return {live,hasBalls,hasInv,balls,potions,revives,prevHunt:resumo(P.prev),shiny
 
   async function refreshStats() {
     if (!statsOpen || dragging) return;
+    const activeStatsControl = document.activeElement;
+    if (activeStatsControl && stBody.contains(activeStatsControl) && activeStatsControl.id === 'stFavoriteHunt') return;
     if (stTabs.childElementCount !== count + 1) buildStatsTabs();
     if (statsIdx >= count) { statsIdx = 0; buildStatsTabs(); }
     if (statsIdx === -1) { await renderAggregate(); return; }
@@ -2888,6 +2930,20 @@ return {live,hasBalls,hasInv,balls,potions,revives,prevHunt:resumo(P.prev),shiny
   const saveCardsCfg = () => { try { lsSet('cardsCfg', JSON.stringify(cardsCfg)); } catch {} };
   let recentHunts = {}; try { recentHunts = JSON.parse(localStorage.getItem('recentHunts') || '{}'); } catch {}
   let recentHuntSlots = {}; try { recentHuntSlots = JSON.parse(localStorage.getItem('recentHuntSlots') || '{}'); } catch {}
+  let favoritePokeHunts = {};
+  try {
+    const savedFavorites = JSON.parse(localStorage.getItem('favoritePokeHunts') || '{}');
+    if (savedFavorites && typeof savedFavorites === 'object' && !Array.isArray(savedFavorites)) favoritePokeHunts = savedFavorites;
+  } catch {}
+  const saveFavoritePokeHunts = () => { try { localStorage.setItem('favoritePokeHunts', JSON.stringify(favoritePokeHunts)); } catch {} };
+  function favoriteHuntList() {
+    const seen = new Set();
+    return (huntsCache || []).filter(h => {
+      const slug = String((h && h.slug) || '').trim().toLowerCase();
+      if (!slug || seen.has(slug)) return false;
+      seen.add(slug); return true;
+    }).slice().sort((a, b) => (+a.level || 0) - (+b.level || 0) || String(a.name || '').localeCompare(String(b.name || '')));
+  }
   let stoneSelected = {}; try { stoneSelected = JSON.parse(localStorage.getItem('stoneSelected') || '{}'); } catch {}
   let dexMode = localStorage.getItem('dexMode') || 'all';
   let dexAccSel = -1;
