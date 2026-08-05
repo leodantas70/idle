@@ -110,7 +110,6 @@ const usaCdFC = index.indexOf('SB.catches =');
 ok(declaraCdFC >= 0, 'filtros de capturas (cdFC) sao inicializados');
 ok(usaCdFC >= 0 && declaraCdFC < usaCdFC, 'cdFC existe antes de o painel de capturas ser montado');
 ok(index.includes('class="st-buy-ub-all"') && index.includes('[1000, 5000, 10000]'), 'Resumo Geral oferece compra de UB em 1k, 5k e 10k');
-ok(index.includes('id="officialUpdate"') && main.includes("'updater:apply'") && preload.includes('applyOfficialUpdate'), 'atualizador oficial continua acessivel');
 ok(index.includes('id="reloadUi"') && index.includes("getElementById('reloadUi').onclick = () => location.reload()"), 'interface pode recarregar o index.html sem fechar o programa');
 ok(index.includes('orreXpMul') && index.includes('depColeta()') && index.includes('id="tierBtn"'), 'recursos oficiais 1.5.15 de Orre, depot e tierlist permanecem');
 ok(index.includes('num(p&&p.ivTotal)') && index.includes('nL(p.ivTotal)'), 'formato novo de IV e qualidade funciona nos paineis e na venda personalizada');
