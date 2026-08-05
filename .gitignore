@@ -2,6 +2,7 @@ node_modules/
 dist/
 *.zip
 *.log
+.update-needs-install
 
 # dados locais do usuario (nunca versionar)
 accounts.enc
