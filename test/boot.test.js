@@ -117,6 +117,9 @@ ok(index.includes('id="stFavoriteHunt"') && index.includes('id="stFavoriteTp"') 
 ok(index.includes("localStorage.setItem('favoritePokeHunts'") && index.includes('favoritePokeHunts[favoriteCid]') && index.includes('goToRecentHunt(statsIdx, chosenFavorite.slug'), 'favorito fica salvo por personagem e reutiliza o teleporte');
 ok(index.includes('data-catch-alert=') && index.includes("lsSet('catchAlerts'") && index.includes('avisaCaptura(i, r, x)'), 'alerta de captura fica na Sessao, salvo e ligado apenas a capturas novas');
 ok(index.includes("window.pokeAPI.notify('PokeGrid', acc + ' ' + t('msgCatch')") && index.includes('function beepCapture()'), 'alerta de captura toca som e envia notificacao com o Pokemon');
+ok(index.includes('id="unstuck"') && index.includes("lsGet('unstuckFarm')") && index.includes('checkUnstuck(i, r)'), 'Opcoes permite ligar e desligar a recuperacao automatica do farm');
+ok(index.includes('300000 + Math.floor(Math.random() * 300001)') && index.includes('30000 + Math.floor(Math.random() * 90001)'), 'recuperacao usa espera aleatoria de 5–10 min sem XP e 30 s–2 min na cidade');
+ok(index.includes('[data-guide="dock-home"]') && index.includes('GOTO_HUNT_DOM(hunt.slug'), 'recuperacao vai para a cidade e retorna para a ultima hunt');
 
 try { fs.rmSync(path.join(RAIZ, '.teste-tmp'), { recursive: true, force: true }); } catch {}
 console.log(falhas ? '\n' + falhas + ' falha(s)' : '\nInicializacao: tudo certo');
