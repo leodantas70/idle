@@ -56,6 +56,15 @@ bash iniciar.sh
 
 Pronto. Entre ou crie uma conta em cada painel e, em "Treinadores", salve o login. Da próxima vez ele entra sozinho.
 
+## Documentação
+
+| | |
+|---|---|
+| **[Manual](MANUAL.md)** | O que cada botão e cada seção faz, em linguagem simples |
+| **[FAQ](FAQ.md)** | Dúvidas frequentes: atualizar sem perder nada, pokébola sumida, scripts, planilhas |
+| **[Tutorial](TUTORIAL.md)** | Passo a passo pra rodar a versão sem instalador |
+| **[Mudanças](CHANGELOG.md)** | O que entrou em cada versão |
+
 ## O que ele faz
 
 - Rode 2, 3 ou 4 contas, você escolhe quantos painéis abrir.

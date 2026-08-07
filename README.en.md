@@ -52,6 +52,15 @@ bash iniciar.sh
 
 That is it. Log in or create an account in each panel and, under "Treinadores" (Accounts), save the login. Next time it signs in on its own.
 
+## Documentation
+
+| | |
+|---|---|
+| **[Manual](MANUAL.md)** | What every button and panel section does (Portuguese) |
+| **[FAQ](FAQ.md)** | Common questions: updating without losing anything, the missing pokéball, scripts, spreadsheets |
+| **[Tutorial](TUTORIAL.md)** | Step by step for the no-installer version |
+| **[Changelog](CHANGELOG.md)** | What landed in each version |
+
 ## What it does
 
 - Run 2, 3 or 4 accounts, you choose how many panels to open.
