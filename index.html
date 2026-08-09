@@ -48,6 +48,27 @@
   #langRow span { padding: 0 4px; }
   #menu #langRow button { width: auto; flex: 1; text-align: center; }
 
+  /* Catálogo de itens protegidos: grande, pesquisável e independente das proteções fixas. */
+  #protectOverlay { position: fixed; inset: 0; z-index: 480; display: none; align-items: center; justify-content: center; padding: 28px; background: rgba(3,7,12,.82); backdrop-filter: blur(3px); }
+  #protectOverlay.show { display: flex; }
+  #protectModal { width: min(1120px, 96vw); height: min(820px, 92vh); display: flex; flex-direction: column; overflow: hidden; background: #121820; border: 1px solid #3b4654; border-radius: 12px; box-shadow: 0 24px 70px rgba(0,0,0,.65); }
+  #protectModal .pi-head { display: flex; align-items: center; gap: 12px; padding: 15px 18px; border-bottom: 1px solid #30363d; }
+  #protectModal .pi-head h2 { flex: 1; font-size: 17px; }
+  #protectModal .pi-help { padding: 0 18px 12px; color: #9da7b3; font-size: 12px; line-height: 1.45; }
+  #protectModal .pi-tools { display: grid; grid-template-columns: minmax(220px, 1fr) 190px auto; gap: 9px; padding: 0 18px 13px; }
+  #protectModal input, #protectModal select { min-width: 0; padding: 8px 10px; color: #e6edf3; background: #0d1117; border: 1px solid #30363d; border-radius: 7px; }
+  #protectModal input:focus, #protectModal select:focus { outline: none; border-color: #388bfd; }
+  #protectCount { align-self: center; color: #79c0ff; font-size: 12px; white-space: nowrap; }
+  #protectItemsGrid { flex: 1; overflow: auto; padding: 4px 18px 18px; display: grid; grid-template-columns: repeat(auto-fill, minmax(215px, 1fr)); align-content: start; gap: 8px; }
+  .pi-item { min-height: 58px; display: flex; align-items: center; gap: 9px; padding: 8px 10px; cursor: pointer; user-select: none; background: #171e27; border: 1px solid #30363d; border-radius: 8px; }
+  .pi-item:hover { border-color: #596579; background: #1c2530; }
+  .pi-item.on { border-color: #3fb950; background: #13271a; box-shadow: inset 0 0 0 1px rgba(63,185,80,.18); }
+  .pi-item input { flex: none; accent-color: #3fb950; }
+  .pi-item img { width: 38px; height: 38px; flex: none; object-fit: contain; image-rendering: pixelated; }
+  .pi-item .pi-name { min-width: 0; overflow-wrap: anywhere; font-size: 12px; font-weight: 650; }
+  .pi-item .pi-id { display: block; margin-top: 2px; color: #6e7681; font-size: 10px; font-weight: 400; }
+  #protectEmpty { grid-column: 1 / -1; padding: 50px 12px; color: #8b949e; text-align: center; }
+
   #grid {
     flex: 1; display: grid; gap: 6px; padding: 6px;
     grid-template-columns: 1fr 1fr; grid-auto-rows: 1fr;
@@ -518,6 +539,7 @@
     <button id="reloadAll">⟳ Atualizar tudo</button>
     <button id="dock" title="Mostra ou esconde o menu de ícones do jogo. F2 alterna no painel em foco.">🎛 Menu do jogo</button>
     <button id="statsBtn" title="Resumo da conta em foco (gold/h, XP/h, bag, drops)">📊 Painel</button>
+    <button id="protectItemsBtn" title="Escolha itens que nunca poderão ser vendidos">🔒 Proteger itens</button>
     <button id="cardsBtn" title="Dashboard ultra leve: esconde o jogo e mostra só os números">🃏 Cartas</button>
     <button id="ivsBtn" title="Abre ou fecha a calculadora de IV (JustPokédex) em todos os painéis"><svg width="14" height="14" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" fill="#fff"/><path d="M2 12h20" stroke="#8f1408" stroke-width="3"/><circle cx="12" cy="12" r="3.4" fill="#fff" stroke="#8f1408" stroke-width="2.5"/></svg>IV's</button>
     <div id="menuWrap">
@@ -553,6 +575,18 @@
 
   <div id="ivCard"></div>
   <div id="shinyParty"></div>
+  <div id="protectOverlay">
+    <div id="protectModal" role="dialog" aria-modal="true" aria-labelledby="protectTitle">
+      <div class="pi-head"><h2 id="protectTitle">🔒 Proteger itens</h2><button id="protectClose">Fechar</button></div>
+      <div class="pi-help">Marque qualquer item que nunca deve ser vendido. Esta lista é somada às proteções automáticas que já existem; ela não desativa nenhuma regra anterior.</div>
+      <div class="pi-tools">
+        <input id="protectSearch" type="search" placeholder="Filtrar pelo nome do item…" autocomplete="off">
+        <select id="protectFilter"><option value="all">Todos</option><option value="on">Marcados</option><option value="off">Não marcados</option></select>
+        <span id="protectCount">0 protegidos</span>
+      </div>
+      <div id="protectItemsGrid"><div id="protectEmpty">Entre em pelo menos um personagem para carregar todos os itens do jogo.</div></div>
+    </div>
+  </div>
   <div id="overlay">
     <div id="modal">
       <h2>Treinadores salvos</h2>
@@ -3045,6 +3079,12 @@ return {live,hasBalls,hasInv,balls,potions,revives,prevHunt:resumo(P.prev),shiny
     }).slice().sort((a, b) => (+a.level || 0) - (+b.level || 0) || String(a.name || '').localeCompare(String(b.name || '')));
   }
   let stoneSelected = {}; try { stoneSelected = JSON.parse(localStorage.getItem('stoneSelected') || '{}'); } catch {}
+  let protectedItemIds = new Set();
+  try {
+    const savedProtected = JSON.parse(localStorage.getItem('protectedItemIds') || '[]');
+    if (Array.isArray(savedProtected)) protectedItemIds = new Set(savedProtected.map(String));
+  } catch {}
+  const saveProtectedItems = () => { try { localStorage.setItem('protectedItemIds', JSON.stringify([...protectedItemIds])); } catch {} };
   let dexMode = localStorage.getItem('dexMode') || 'all';
   let dexAccSel = -1;
   let huntTravelTemplate = null; try { huntTravelTemplate = JSON.parse(localStorage.getItem('huntTravelTemplate') || 'null'); } catch {}
@@ -3063,7 +3103,9 @@ return {live,hasBalls,hasInv,balls,potions,revives,prevHunt:resumo(P.prev),shiny
   const BUY_1000_BALL_V2 = (id) => `(async()=>{const id=${JSON.stringify(id)},key='pokeweb:tokens';const read=()=>{try{return JSON.parse(sessionStorage.getItem(key)||localStorage.getItem(key)||'null')}catch(x){return null}};const save=t=>{sessionStorage.setItem(key,JSON.stringify(t));try{localStorage.removeItem(key)}catch(x){}};const post=token=>fetch('/api/game/shop/buy',{method:'POST',headers:{'Content-Type':'application/json',...(token?{Authorization:'Bearer '+token}:{})},body:JSON.stringify({ballId:+id,qty:1000})});try{let tokens=read();if(!tokens||!tokens.accessToken)return {ok:false,reason:'Sessão sem token'};let r=await post(tokens.accessToken);if(r.status===401&&tokens.refreshToken){const rr=await fetch('/api/auth/refresh',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({refreshToken:tokens.refreshToken})});if(rr.ok){tokens=await rr.json();save(tokens);r=await post(tokens.accessToken);}}const j=await r.json().catch(()=>({}));if(!r.ok)return {ok:false,reason:j.message||('HTTP '+r.status)};try{if(window.__poke&&window.__poke.sock&&window.__poke.sock.readyState===1)window.__poke.sock.send(JSON.stringify({type:'inv-get'}))}catch(x){}return {ok:true,bought:j.bought||1000};}catch(e){return {ok:false,reason:e.message||'Erro na compra'};}})()`;
   const BUY_1000_SUPPLY = (kind, id) => `(async()=>{const kind=${JSON.stringify(kind)},id=${JSON.stringify(id)},key='pokeweb:tokens';const read=()=>{try{return JSON.parse(sessionStorage.getItem(key)||localStorage.getItem(key)||'null')}catch(x){return null}};const save=t=>{sessionStorage.setItem(key,JSON.stringify(t));try{localStorage.removeItem(key)}catch(x){}};const post=token=>fetch('/api/game/shop/buy',{method:'POST',headers:{'Content-Type':'application/json',Authorization:'Bearer '+token},body:JSON.stringify({[kind==='ball'?'ballId':'itemId']:+id,qty:1000})});try{let tokens=read();if(!tokens||!tokens.accessToken)return {ok:false,reason:'Sessão sem token'};let r=await post(tokens.accessToken);if(r.status===401&&tokens.refreshToken){const rr=await fetch('/api/auth/refresh',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({refreshToken:tokens.refreshToken})});if(rr.ok){tokens=await rr.json();save(tokens);r=await post(tokens.accessToken);}}const j=await r.json().catch(()=>({}));if(!r.ok)return {ok:false,reason:j.message||('HTTP '+r.status)};try{if(window.__poke&&window.__poke.sock&&window.__poke.sock.readyState===1)window.__poke.sock.send(JSON.stringify({type:'inv-get'}))}catch(x){}return {ok:true};}catch(e){return {ok:false,reason:e.message||'Erro na compra'};}})()`;
   const SELL_SAFE_ITEMS = `(()=>{const key='pokeweb:tokens',blocked=/boss|key|card|picture|strange\\s+pheromone/i;const read=()=>{try{return JSON.parse(sessionStorage.getItem(key)||localStorage.getItem(key)||'null')}catch(x){return null}};const save=t=>{sessionStorage.setItem(key,JSON.stringify(t));try{localStorage.removeItem(key)}catch(x){}};return(async()=>{try{let tokens=read();if(!tokens||!tokens.accessToken)return {ok:false,reason:'Sessão sem token'};const P=window.__poke,inv=(P&&P.ws&&P.ws.inventory&&P.ws.inventory.items)||[],doc=P&&P.api&&P.api['/game/items.json'],cat={};if(doc&&doc.items)doc.items.forEach(x=>cat[x.id]=x);const items=inv.map(x=>({itemId:+x.itemId,qty:+x.quantity||0,name:String((cat[x.itemId]||{}).name||'')})).filter(x=>x.qty>0&&x.name&&!blocked.test(x.name)&&+((cat[x.itemId]||{}).npcPrice||0)>0).map(({itemId,qty})=>({itemId,qty}));if(!items.length)return {ok:false,reason:'Nenhum item permitido para vender'};const post=token=>fetch('/api/game/shop/sell',{method:'POST',headers:{'Content-Type':'application/json',Authorization:'Bearer '+token},body:JSON.stringify({items})});let r=await post(tokens.accessToken);if(r.status===401&&tokens.refreshToken){const rr=await fetch('/api/auth/refresh',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({refreshToken:tokens.refreshToken})});if(rr.ok){tokens=await rr.json();save(tokens);r=await post(tokens.accessToken);}}const j=await r.json().catch(()=>({}));if(!r.ok)return {ok:false,reason:j.message||('HTTP '+r.status)};try{P.sock&&P.sock.send(JSON.stringify({type:'inv-get'}))}catch(x){}return {ok:true,sold:j.soldCount||items.length,gold:j.goldGained||0};}catch(e){return {ok:false,reason:e.message||'Erro na venda'};}})()})()`;
-  const SELL_SAFE_ITEMS_V2 = SELL_SAFE_ITEMS.replace("x.qty>0&&x.name&&", "x.qty>0&&x.name&&!['heal','revive','stone'].includes(String((cat[x.itemId]||{}).category||''))&&");
+  const SELL_SAFE_ITEMS_V2 = protectedIds => SELL_SAFE_ITEMS
+    .replace("const key=", "const protectedIds=new Set(" + JSON.stringify(protectedIds.map(String)) + "),key=")
+    .replace("x.qty>0&&x.name&&", "x.qty>0&&x.name&&!protectedIds.has(String(x.itemId))&&!['heal','revive','stone'].includes(String((cat[x.itemId]||{}).category||''))&&");
   const SELL_SAFE_POKES = `(async()=>{const num=v=>{const m=String(v==null?'':v).match(/[0-9]+([.,][0-9]+)?/);return m?+m[0].replace(',','.'):NaN};const key='pokeweb:tokens';const read=()=>{try{return JSON.parse(sessionStorage.getItem(key)||localStorage.getItem(key)||'null')}catch(x){return null}};const save=t=>{sessionStorage.setItem(key,JSON.stringify(t));try{localStorage.removeItem(key)}catch(x){}};try{let tokens=read();if(!tokens||!tokens.accessToken)return {ok:false,reason:'Sessão sem token'};const P=window.__poke,list=(P&&P.ws&&P.ws.pokes&&P.ws.pokes.list)||[];const safe=list.filter(p=>{const iv=num(p&&p.ivTotal),q=num(p&&p.quality);return p&&p.id&&!p.team&&!p.leader&&!p.starter&&!p.shiny&&!p.locked&&(+p.sellValue||0)>0&&Number.isFinite(iv)&&Number.isFinite(q)&&iv<150&&q<1.7;});if(!safe.length)return {ok:false,reason:'Nenhum Pokémon permitido para vender (IV menor que 150 e até Épico)'};const pokeIds=safe.map(p=>p.id);const post=token=>fetch('/api/game/pokemon/sell',{method:'POST',headers:{'Content-Type':'application/json',Authorization:'Bearer '+token},body:JSON.stringify({pokeIds})});let r=await post(tokens.accessToken);if(r.status===401&&tokens.refreshToken){const rr=await fetch('/api/auth/refresh',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({refreshToken:tokens.refreshToken})});if(rr.ok){tokens=await rr.json();save(tokens);r=await post(tokens.accessToken);}}const j=await r.json().catch(()=>({}));if(!r.ok)return {ok:false,reason:j.message||('HTTP '+r.status)};try{P.sock&&P.sock.send(JSON.stringify({type:'pokes-get'}))}catch(x){}return {ok:true,sold:j.sold||pokeIds.length,gold:j.goldGained||0};}catch(e){return {ok:false,reason:e.message||'Erro na venda de Pokémon'};}})()`;
   const SELL_SELECTED_STONES = ids => `(async()=>{const ids=${JSON.stringify(ids)},key='pokeweb:tokens',blocked=/boss|key|card|picture|strange\\s+pheromone/i;const read=()=>{try{return JSON.parse(sessionStorage.getItem(key)||localStorage.getItem(key)||'null')}catch(x){return null}};const save=t=>{sessionStorage.setItem(key,JSON.stringify(t));try{localStorage.removeItem(key)}catch(x){}};try{let tokens=read();if(!tokens||!tokens.accessToken)return {ok:false,reason:'Sessão sem token'};const P=window.__poke,inv=(P&&P.ws&&P.ws.inventory&&P.ws.inventory.items)||[],doc=P&&P.api&&P.api['/game/items.json'],cat={};if(doc&&doc.items)doc.items.forEach(x=>cat[x.id]=x);const stones=inv.map(x=>({id:+x.itemId,qty:+x.quantity||0,item:cat[x.itemId]||{}})).filter(x=>ids.includes(String(x.id))&&x.qty>0&&String(x.item.category||'').toLowerCase()==='stone'&&!blocked.test(String(x.item.name||'')));if(!stones.length)return {ok:false,reason:'Nenhuma Stone permitida foi selecionada'};const post=(token,x)=>fetch('/api/game/flint/sell',{method:'POST',headers:{'Content-Type':'application/json',Authorization:'Bearer '+token},body:JSON.stringify({itemId:x.id,qty:x.qty})});let sold=0,gold=0;for(const x of stones){let r=await post(tokens.accessToken,x);if(r.status===401&&tokens.refreshToken){const rr=await fetch('/api/auth/refresh',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({refreshToken:tokens.refreshToken})});if(rr.ok){tokens=await rr.json();save(tokens);r=await post(tokens.accessToken,x);}}const j=await r.json().catch(()=>({}));if(!r.ok)return {ok:false,reason:j.message||('HTTP '+r.status),sold,gold};sold+=+j.sold||x.qty;gold+=+j.goldGained||0;}try{P.sock&&P.sock.send(JSON.stringify({type:'inv-get'}))}catch(x){}return {ok:true,sold,gold,types:stones.length};}catch(e){return {ok:false,reason:e.message||'Erro na venda de Stones'};}})()`;
   function goToRecentHunt(i, slug, name) {
@@ -3143,7 +3185,7 @@ return {live,hasBalls,hasInv,balls,potions,revives,prevHunt:resumo(P.prev),shiny
   }
   function sellSafeItems(i) {
     const w = webviews[i]; if (!w || off[i]) return;
-    w.executeJavaScript(SELL_SAFE_ITEMS_V2).then(r => {
+    w.executeJavaScript(SELL_SAFE_ITEMS_V2([...protectedItemIds])).then(r => {
       if (!r || !r.ok) window.alert('Venda não realizada: ' + ((r && r.reason) || 'erro desconhecido'));
       else { window.alert('Venda concluída: ' + nf(r.sold) + ' tipos de item · ' + nf(r.gold) + ' gold'); refreshCards(); }
     }).catch(e => window.alert('Venda não realizada: ' + (e && e.message ? e.message : 'erro desconhecido')));
@@ -3296,7 +3338,7 @@ return {live,hasBalls,hasInv,balls,potions,revives,prevHunt:resumo(P.prev),shiny
   let basesByName = {}; // bases do creatures.json, por nome minusculo (poder do time)
   let movesByName = {}; // golpes compactos e nivel de hunt por especie (sugestao de onde cacar)
   let itensCache = null, itensCacheT = 0; // id -> {n:nome, ic:icone} do items.json do jogo
-  const ITEMS_JS = `(async () => { try { const r = await fetch('/game/items.json'); const j = await r.json(); const o = {}; ((j && j.items) || []).slice(0, 1200).forEach(it => { if (it && it.id != null) o[it.id] = { n: String(it.name || '').slice(0, 40), ic: String(it.icon || '').slice(0, 200) }; }); return o; } catch (e) { return null; } })()`;
+  const ITEMS_JS = `(async () => { try { const r = await fetch('/game/items.json'); const j = await r.json(); const o = {}; ((j && j.items) || []).forEach(it => { if (it && it.id != null) o[it.id] = { n: String(it.name || '').slice(0, 80), ic: String(it.icon || '').slice(0, 240) }; }); return o; } catch (e) { return null; } })()`;
   function carregaItens() {
     if (itensCache || Date.now() - itensCacheT < 60e3) return;
     itensCacheT = Date.now();
@@ -3306,6 +3348,74 @@ return {live,hasBalls,hasInv,balls,potions,revives,prevHunt:resumo(P.prev),shiny
       break;
     }
   }
+  const protectOverlay = document.getElementById('protectOverlay');
+  const protectGrid = document.getElementById('protectItemsGrid');
+  const protectSearch = document.getElementById('protectSearch');
+  const protectFilter = document.getElementById('protectFilter');
+  const protectCount = document.getElementById('protectCount');
+  const protectIcon = u => {
+    u = String(u || '');
+    if (/^https:\/\/(poke\.idleworld\.online|raw\.githubusercontent\.com)\/[\w\-./%]+$/.test(u)) return u;
+    if (/^\/[\w\-./%]+$/.test(u)) return 'https://poke.idleworld.online' + u;
+    return '';
+  };
+  function renderProtectedItems() {
+    protectCount.textContent = protectedItemIds.size + (protectedItemIds.size === 1 ? ' protegido' : ' protegidos');
+    if (!itensCache) {
+      protectGrid.innerHTML = '<div id="protectEmpty">Entre em pelo menos um personagem para carregar todos os itens do jogo.</div>';
+      return;
+    }
+    const q = String(protectSearch.value || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+    const mode = protectFilter.value;
+    const rows = Object.entries(itensCache).map(([id, it]) => ({ id:String(id), n:String((it && it.n) || ('#' + id)), ic:String((it && it.ic) || '') }))
+      .filter(x => {
+        const on = protectedItemIds.has(x.id);
+        const name = x.n.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+        return (!q || name.includes(q)) && (mode === 'all' || (mode === 'on' ? on : !on));
+      }).sort((a, b) => a.n.localeCompare(b.n, 'pt-BR', { sensitivity:'base' }));
+    if (!rows.length) {
+      protectGrid.innerHTML = '<div id="protectEmpty">Nenhum item encontrado com este filtro.</div>';
+      return;
+    }
+    protectGrid.innerHTML = rows.map(x => {
+      const on = protectedItemIds.has(x.id), src = protectIcon(x.ic);
+      return '<label class="pi-item' + (on ? ' on' : '') + '"><input class="pi-check" type="checkbox" data-id="' + esc(x.id) + '"' + (on ? ' checked' : '') + '>'
+        + (src ? '<img src="' + esc(src) + '" alt="" onerror="this.remove()">' : '')
+        + '<span class="pi-name">' + esc(x.n) + '<small class="pi-id">ID ' + esc(x.id) + '</small></span></label>';
+    }).join('');
+    protectGrid.querySelectorAll('.pi-check').forEach(ch => ch.onchange = () => {
+      const id = String(ch.dataset.id || '');
+      if (ch.checked) protectedItemIds.add(id); else protectedItemIds.delete(id);
+      saveProtectedItems();
+      if (protectFilter.value === 'all') {
+        ch.closest('.pi-item').classList.toggle('on', ch.checked);
+        protectCount.textContent = protectedItemIds.size + (protectedItemIds.size === 1 ? ' protegido' : ' protegidos');
+      } else renderProtectedItems();
+    });
+  }
+  async function openProtectedItems() {
+    protectOverlay.classList.add('show');
+    protectSearch.focus();
+    renderProtectedItems();
+    if (itensCache) return;
+    protectGrid.innerHTML = '<div id="protectEmpty">Carregando todos os itens do jogo…</div>';
+    itensCacheT = Date.now();
+    for (let i = 0; i < count; i++) {
+      if (off[i] || !webviews[i]) continue;
+      try {
+        const r = await webviews[i].executeJavaScript(ITEMS_JS);
+        if (r && Object.keys(r).length) itensCache = r;
+      } catch {}
+      if (itensCache) break;
+    }
+    renderProtectedItems();
+  }
+  document.getElementById('protectItemsBtn').onclick = openProtectedItems;
+  document.getElementById('protectClose').onclick = () => protectOverlay.classList.remove('show');
+  protectOverlay.onclick = e => { if (e.target === protectOverlay) protectOverlay.classList.remove('show'); };
+  protectSearch.oninput = renderProtectedItems;
+  protectFilter.onchange = renderProtectedItems;
+  document.addEventListener('keydown', e => { if (e.key === 'Escape' && protectOverlay.classList.contains('show')) protectOverlay.classList.remove('show'); });
   function carregaHunts() {
     if (huntsCache || Date.now() - huntsCacheT < 60e3) return;
     huntsCacheT = Date.now();
