@@ -68,6 +68,18 @@
   .pi-item .pi-name { min-width: 0; overflow-wrap: anywhere; font-size: 12px; font-weight: 650; }
   .pi-item .pi-id { display: block; margin-top: 2px; color: #6e7681; font-size: 10px; font-weight: 400; }
   #protectEmpty { grid-column: 1 / -1; padding: 50px 12px; color: #8b949e; text-align: center; }
+  #layoutsOverlay { position:fixed; inset:0; z-index:470; display:none; align-items:center; justify-content:center; background:rgba(3,7,12,.82); }
+  #layoutsOverlay.show { display:flex; }
+  #layoutsModal { width:min(620px,92vw); max-height:88vh; overflow:auto; padding:18px; background:#121820; border:1px solid #3b4654; border-radius:12px; box-shadow:0 22px 65px rgba(0,0,0,.65); }
+  #layoutsModal .lo-head { display:flex; align-items:center; gap:12px; margin-bottom:8px; }
+  #layoutsModal .lo-head h2 { flex:1; font-size:17px; }
+  #layoutsModal .lo-help { color:#9da7b3; font-size:12px; line-height:1.45; margin-bottom:12px; }
+  #layoutsModal .lo-list { display:grid; grid-template-columns:1fr 1fr; gap:8px; }
+  #layoutsModal .lo-opt { display:flex; gap:9px; align-items:flex-start; padding:11px; background:#171e27; border:1px solid #30363d; border-radius:8px; cursor:pointer; }
+  #layoutsModal .lo-opt:has(input:checked) { background:#13271a; border-color:#3fb950; }
+  #layoutsModal .lo-opt input { margin-top:2px; accent-color:#3fb950; }
+  #layoutsModal .lo-opt b { display:block; font-size:12px; }
+  #layoutsModal .lo-opt small { display:block; color:#8b949e; margin-top:3px; line-height:1.3; }
 
   #grid {
     flex: 1; display: grid; gap: 6px; padding: 6px;
@@ -542,6 +554,7 @@
     <button id="protectItemsBtn" title="Escolha itens que nunca poderão ser vendidos">🔒 Proteger itens</button>
     <button id="cardsBtn" title="Dashboard ultra leve: esconde o jogo e mostra só os números">🃏 Cartas</button>
     <button id="ivsBtn" title="Abre ou fecha a calculadora de IV (JustPokédex) em todos os painéis"><svg width="14" height="14" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" fill="#fff"/><path d="M2 12h20" stroke="#8f1408" stroke-width="3"/><circle cx="12" cy="12" r="3.4" fill="#fff" stroke="#8f1408" stroke-width="2.5"/></svg>IV's</button>
+    <button id="layoutsBtn" title="Escolha quais partes visuais do jogo serão modificadas">🎨 Layouts</button>
     <div id="menuWrap">
       <button id="menuBtn">☰ Opções</button>
       <div id="menu">
@@ -561,6 +574,7 @@
         <button id="autoStart" style="display:none" title="Cria um atalho na pasta Inicializar do Windows pra abrir o PokeGrid junto com o sistema">🚀 Abrir com o Windows</button>
         <button id="sndShiny" title="Toca um som quando um shiny aparece (além da notificação)">✨🔊 Som do shiny</button>
         <button id="reloadUi" title="Carrega novamente o index.html sem fechar o PokeGrid">↻ Recarregar interface</button>
+        <button id="refreshPediaItems" title="Busca novamente o catálogo e as imagens atuais da Poképedia">🔄 Atualizar itens da Poképedia</button>
         <button id="manBtn" title="Manual: o que cada parte do app faz">📖 Manual</button> <button id="faqBtn" title="Perguntas frequentes: abre o FAQ no navegador">❓ FAQ</button> <button id="bkExp" title="Salva um arquivo com todas as configurações e o histórico (senhas ficam fora)">💾 Exportar config</button>
         <button id="bkImp" title="Restaura configurações e histórico de um arquivo exportado">📂 Importar config</button>
         <button id="layout">▦ Grade</button>
@@ -575,6 +589,18 @@
 
   <div id="ivCard"></div>
   <div id="shinyParty"></div>
+  <div id="layoutsOverlay"><div id="layoutsModal">
+    <div class="lo-head"><h2>🎨 Layouts do jogo</h2><button id="layoutsClose">Fechar</button></div>
+    <div class="lo-help">Somente mudanças visuais extraídas do script Interface. Não ativa as automações nem as outras funções daquele script.</div>
+    <div class="lo-list">
+      <label class="lo-opt"><input type="checkbox" data-layout="map"><span><b>Mapa simplificado</b><small>Troca o mapa gráfico por uma lista limpa de hunts. Clique na linha para ir à hunt.</small></span></label>
+      <label class="lo-opt"><input type="checkbox" data-layout="windows"><span><b>Janelas arredondadas</b><small>Arredonda as janelas e painéis abertos dentro do jogo.</small></span></label>
+      <label class="lo-opt"><input type="checkbox" data-layout="hud"><span><b>Menu e HUD destacados</b><small>Aplica bordas e cantos arredondados ao menu e ao status do personagem.</small></span></label>
+      <label class="lo-opt"><input type="checkbox" data-layout="inventory"><span><b>Inventário ampliado</b><small>Deixa a bolsa maior, redimensionável e com grade mais organizada.</small></span></label>
+      <label class="lo-opt"><input type="checkbox" data-layout="analyzer"><span><b>Hunt Analyzer compacto</b><small>Reduz espaços e arredonda o painel do analisador.</small></span></label>
+      <label class="lo-opt"><input type="checkbox" data-layout="chat"><span><b>Chat compacto</b><small>Arredonda e reduz visualmente a janela do chat.</small></span></label>
+    </div>
+  </div></div>
   <div id="protectOverlay">
     <div id="protectModal" role="dialog" aria-modal="true" aria-labelledby="protectTitle">
       <div class="pi-head"><h2 id="protectTitle">🔒 Proteger itens</h2><button id="protectClose">Fechar</button></div>
@@ -925,6 +951,7 @@ S.supBase=cur;if(S.picBase==null){S.picBase=now;}else{if(now>S.picBase){const do
           wv.executeJavaScript(QOL_UI).catch(() => {});
           wv.executeJavaScript(chatScript(chatHidden || cardsOn)).catch(() => {});
           wv.executeJavaScript(dockScript(dockHidden)).catch(() => {});
+          applyGameLayoutsTo(i);
           // so na tela de login, pra nao rodar a toa dentro do jogo
           if ((wv.getURL() || '').startsWith(LOGIN_URL)) wv.executeJavaScript(scrollLoginScript).catch(() => {});
           wv.executeJavaScript(`localStorage.setItem('poke_lang', ${JSON.stringify(lang === 'pt' ? 'pt' : 'en')})`).catch(() => {}); // mantem o jogo no idioma escolhido (es usa en, o jogo so tem pt/en)
@@ -3338,7 +3365,7 @@ return {live,hasBalls,hasInv,balls,potions,revives,prevHunt:resumo(P.prev),shiny
   let basesByName = {}; // bases do creatures.json, por nome minusculo (poder do time)
   let movesByName = {}; // golpes compactos e nivel de hunt por especie (sugestao de onde cacar)
   let itensCache = null, itensCacheT = 0; // id -> {n:nome, ic:icone} do items.json do jogo
-  const ITEMS_JS = `(async () => { try { const r = await fetch('/game/items.json'); const j = await r.json(); const o = {}; ((j && j.items) || []).forEach(it => { if (it && it.id != null) o[it.id] = { n: String(it.name || '').slice(0, 80), ic: String(it.icon || '').slice(0, 240) }; }); return o; } catch (e) { return null; } })()`;
+  const ITEMS_JS = `(async () => { try { const r = await fetch('/game/items.json',{cache:'no-store'}); const j = await r.json(); const o = {}; ((j && j.items) || []).forEach(it => { if (it && it.id != null) o[it.id] = { n: String(it.name || '').slice(0, 80), ic: String(it.image || it.icon || it.sprite || it.img || '').slice(0, 240), cat:String(it.category||'').slice(0,30) }; }); return o; } catch (e) { return null; } })()`;
   function carregaItens() {
     if (itensCache || Date.now() - itensCacheT < 60e3) return;
     itensCacheT = Date.now();
@@ -3359,6 +3386,10 @@ return {live,hasBalls,hasInv,balls,potions,revives,prevHunt:resumo(P.prev),shiny
     if (/^\/[\w\-./%]+$/.test(u)) return 'https://poke.idleworld.online' + u;
     return '';
   };
+  const protectFallbackIcon = (name, cat) => {
+    const slug = String(name || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z0-9]+/g,'_').replace(/^_|_$/g,'');
+    return slug ? 'https://poke.idleworld.online/assets/' + (String(cat).toLowerCase() === 'stone' ? 'stones/' + slug + '.gif' : 'items/' + slug + '.png') : '';
+  };
   function renderProtectedItems() {
     protectCount.textContent = protectedItemIds.size + (protectedItemIds.size === 1 ? ' protegido' : ' protegidos');
     if (!itensCache) {
@@ -3367,7 +3398,7 @@ return {live,hasBalls,hasInv,balls,potions,revives,prevHunt:resumo(P.prev),shiny
     }
     const q = String(protectSearch.value || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
     const mode = protectFilter.value;
-    const rows = Object.entries(itensCache).map(([id, it]) => ({ id:String(id), n:String((it && it.n) || ('#' + id)), ic:String((it && it.ic) || '') }))
+    const rows = Object.entries(itensCache).map(([id, it]) => ({ id:String(id), n:String((it && it.n) || ('#' + id)), ic:String((it && it.ic) || ''), cat:String((it && it.cat) || '') }))
       .filter(x => {
         const on = protectedItemIds.has(x.id);
         const name = x.n.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
@@ -3378,9 +3409,9 @@ return {live,hasBalls,hasInv,balls,potions,revives,prevHunt:resumo(P.prev),shiny
       return;
     }
     protectGrid.innerHTML = rows.map(x => {
-      const on = protectedItemIds.has(x.id), src = protectIcon(x.ic);
+      const on = protectedItemIds.has(x.id), src = protectIcon(x.ic) || protectFallbackIcon(x.n, x.cat);
       return '<label class="pi-item' + (on ? ' on' : '') + '"><input class="pi-check" type="checkbox" data-id="' + esc(x.id) + '"' + (on ? ' checked' : '') + '>'
-        + (src ? '<img src="' + esc(src) + '" alt="" onerror="this.remove()">' : '')
+        + (src ? '<img src="' + esc(src) + '" alt="" onerror="this.style.visibility=\'hidden\'">' : '')
         + '<span class="pi-name">' + esc(x.n) + '<small class="pi-id">ID ' + esc(x.id) + '</small></span></label>';
     }).join('');
     protectGrid.querySelectorAll('.pi-check').forEach(ch => ch.onchange = () => {
@@ -3416,6 +3447,40 @@ return {live,hasBalls,hasInv,balls,potions,revives,prevHunt:resumo(P.prev),shiny
   protectSearch.oninput = renderProtectedItems;
   protectFilter.onchange = renderProtectedItems;
   document.addEventListener('keydown', e => { if (e.key === 'Escape' && protectOverlay.classList.contains('show')) protectOverlay.classList.remove('show'); });
+  async function refreshItemsCatalog(showMessage) {
+    itensCache = null; itensCacheT = Date.now();
+    let loaded = null;
+    for (let i = 0; i < count; i++) {
+      if (off[i] || !webviews[i]) continue;
+      try { const r = await webviews[i].executeJavaScript(ITEMS_JS); if (r && Object.keys(r).length) { loaded = r; break; } } catch {}
+    }
+    if (loaded) itensCache = loaded;
+    if (protectOverlay.classList.contains('show')) renderProtectedItems();
+    if (showMessage) window.alert(loaded ? 'Itens da Poképedia atualizados: ' + Object.keys(loaded).length + ' itens carregados.' : 'Não foi possível atualizar. Entre em pelo menos um personagem e tente novamente.');
+    return !!loaded;
+  }
+  document.getElementById('refreshPediaItems').onclick = () => { menu.classList.remove('show'); refreshItemsCatalog(true); };
+
+  let gameLayouts = { map:true, windows:false, hud:false, inventory:false, analyzer:false, chat:false };
+  try { gameLayouts = Object.assign(gameLayouts, lsObj('gameLayouts')); } catch {}
+  const LAYOUTS_JS = cfg => `(()=>{const C=${JSON.stringify(cfg)},sid='__pgLayoutStyle';let st=document.getElementById(sid);if(!st){st=document.createElement('style');st.id=sid;document.head.appendChild(st);}st.textContent=
+    (C.windows?'.win-window,.cfg-window,.mk-window,.ball-window,.ha-window,.inv-window,.dex-window,.dep-window,.prof-window,.breed-window,.poke-window,.cap-panel,.chat-box,.npc-dialog{border-radius:10px!important;overflow:hidden!important;}':'')+
+    (C.hud?'nav.game-dock,.phud.game-hud-tl,.phud.game-hud.t1{border-radius:10px!important;border:2px solid rgb(120,90,40)!important;border-image:none!important;background-clip:padding-box!important;}':'')+
+    (C.inventory?'.inv-window{width:min(760px,94vw)!important;max-width:94vw!important;resize:both!important;overflow:auto!important}.inv-window .inv-grid{grid-template-columns:repeat(auto-fill,42px)!important;gap:6px!important}.inv-window .inv-slot{width:42px!important;height:42px!important;}':'')+
+    (C.analyzer?'.ha-window{border-radius:12px!important;max-height:88vh!important;overflow:auto!important}.ha-window .ha-card{padding:6px!important}.ha-window .ha-section{margin-top:6px!important;}':'')+
+    (C.chat?'.chat-box{border-radius:12px!important;max-height:42vh!important}.chat-box .chat-messages{font-size:12px!important;}':'')+
+    (C.map?'.map-window{width:820px!important;max-width:95vw!important;height:min(680px,92vh)!important;border-radius:14px!important;overflow:hidden!important}.map-window .map-viewport,.map-window .map-img,.map-window .map-zoom{display:none!important}.map-window .hunt-marker{opacity:0!important;position:absolute!important;pointer-events:none!important}.map-window .map-body{display:flex!important;flex-direction:column!important;overflow:hidden!important;width:100%!important;max-width:100%!important;background:#0b141c!important;padding:0 12px 12px!important}#__pgSimpleMap{flex:1;min-height:0;overflow:auto;padding:5px;display:flex;flex-direction:column;gap:7px}.pg-map-row{display:flex;align-items:center;gap:11px;padding:9px 12px;background:#14222d;border-left:4px solid #273f52;border-radius:9px;color:#e2e8f0;cursor:pointer}.pg-map-row:hover{background:#172a37;transform:translateX(2px)}.pg-map-row.here{background:#163126;border-color:#4caf50}.pg-map-row.locked{background:#25191d;border-color:#e05252;opacity:.72;cursor:not-allowed}.pg-map-sprite{width:40px;height:40px;min-width:40px;border-radius:50%;background:#1c3040;display:flex;align-items:center;justify-content:center;overflow:hidden}.pg-map-info{flex:1}.pg-map-info b{color:#fff}.pg-map-meta{font-size:11px;color:#9fb0bd;margin-top:3px}.pg-map-tools{display:grid;grid-template-columns:1fr 180px;gap:8px;margin:8px 0;padding:9px;background:#101d27;border:1px solid #203544;border-radius:10px}.pg-map-tools input,.pg-map-tools select{padding:7px;background:#0d1a24;color:#e2e8f0;border:1px solid #263d4e;border-radius:7px;}':'');
+    const old=document.getElementById('__pgSimpleMap'),tools=document.getElementById('__pgMapTools');if(!C.map){window.__pgLayoutRender=()=>{};old&&old.remove();tools&&tools.remove();return true;}
+    const render=()=>{const body=document.querySelector('.map-window .map-body');if(!body)return;let box=document.getElementById('__pgSimpleMap'),bar=document.getElementById('__pgMapTools');if(!bar){bar=document.createElement('div');bar.id='__pgMapTools';bar.className='pg-map-tools';bar.innerHTML='<input placeholder="Filtrar hunt…"><select><option value="all">Todas as hunts</option><option value="open">Somente acessíveis</option></select>';body.appendChild(bar);bar.querySelectorAll('input,select').forEach(e=>e.addEventListener('input',render));}if(!box){box=document.createElement('div');box.id='__pgSimpleMap';body.appendChild(box);}const q=bar.querySelector('input').value.toLowerCase(),mode=bar.querySelector('select').value;const lv=+(((document.querySelector('.phud-tlevel,.phud-level,[data-guide="player-level"]')||{}).textContent||'').match(/\\d+/)||[0])[0];const rows=[...document.querySelectorAll('.map-window .hunt-marker')].map(m=>{const n=((m.querySelector('.hunt-name')||{}).textContent||'').trim(),lt=((m.querySelector('.hunt-lvl')||{}).textContent||'').trim(),need=+(lt.match(/\\d+/)||[1])[0],ic=m.querySelector('.hunt-circle div[style*="background-image"]');return{m,n,lt,need,open:!lv||lv>=need,here:m.classList.contains('here'),style:ic?ic.getAttribute('style'):''};}).filter(x=>x.n&&(!q||x.n.toLowerCase().includes(q))&&(mode!=='open'||x.open));box.innerHTML='';rows.sort((a,b)=>(b.here-a.here)||a.need-b.need||a.n.localeCompare(b.n)).forEach(x=>{const r=document.createElement('div');r.className='pg-map-row'+(x.here?' here':'')+(x.open?'':' locked');r.innerHTML='<span class="pg-map-sprite">'+(x.style?'<i style="'+x.style.replace(/"/g,'&quot;')+'"></i>':'')+'</span><span class="pg-map-info"><b></b><span class="pg-map-meta"></span></span>';r.querySelector('b').textContent=x.n;r.querySelector('.pg-map-meta').textContent=x.lt+(x.here?' · Aqui':(!x.open?' · Requer nível '+x.need:''));r.onclick=()=>{if(x.open)x.m.click()};box.appendChild(r);});if(!rows.length)box.textContent='Nenhuma hunt encontrada.';};
+    window.__pgLayoutRender=render;render();if(!window.__pgLayoutObserver){let tm;window.__pgLayoutObserver=new MutationObserver(()=>{clearTimeout(tm);tm=setTimeout(()=>{try{window.__pgLayoutRender&&window.__pgLayoutRender()}catch(x){}},180)});window.__pgLayoutObserver.observe(document.body,{childList:true,subtree:true});}return true;})()`;
+  function applyGameLayoutsTo(i) { const w = webviews[i]; if (w && !off[i]) try { w.executeJavaScript(LAYOUTS_JS(gameLayouts)).catch(() => {}); } catch {} }
+  function applyGameLayoutsAll() { for (let i = 0; i < count; i++) applyGameLayoutsTo(i); }
+  const layoutsOverlay = document.getElementById('layoutsOverlay');
+  const renderLayouts = () => document.querySelectorAll('[data-layout]').forEach(ch => { ch.checked = !!gameLayouts[ch.dataset.layout]; });
+  document.getElementById('layoutsBtn').onclick = () => { renderLayouts(); layoutsOverlay.classList.add('show'); };
+  document.getElementById('layoutsClose').onclick = () => layoutsOverlay.classList.remove('show');
+  layoutsOverlay.onclick = e => { if (e.target === layoutsOverlay) layoutsOverlay.classList.remove('show'); };
+  document.querySelectorAll('[data-layout]').forEach(ch => ch.onchange = () => { gameLayouts[ch.dataset.layout] = ch.checked; lsSet('gameLayouts', JSON.stringify(gameLayouts)); applyGameLayoutsAll(); });
   function carregaHunts() {
     if (huntsCache || Date.now() - huntsCacheT < 60e3) return;
     huntsCacheT = Date.now();

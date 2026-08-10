@@ -90,7 +90,7 @@ ok(registrados.size === canais.length, 'todos os canais foram registrados uma ve
 
 console.log('--- scripts injetados nos paineis parseiam ---');
 const pega = (marca) => { const i = index.indexOf(marca); if (i < 0) return null; const ini = index.indexOf('`', i) + 1; return index.slice(ini, index.indexOf('`;', ini)); };
-[['READ_STATE', 'READ_STATE = `'], ['READ_ALERTS', 'READ_ALERTS = `('], ['HUNTS_JS', 'const HUNTS_JS = `'], ['SELLGUARD', 'const SELLGUARD = `'], ['READ_BAG_IV', 'const READ_BAG_IV = `'], ['SELL_SAFE_POKES', 'const SELL_SAFE_POKES = `'], ['BUY_UB_BATCH', 'const BUY_UB_BATCH = qty => `']].forEach(([nome, marca]) => {
+[['READ_STATE', 'READ_STATE = `'], ['READ_ALERTS', 'READ_ALERTS = `('], ['HUNTS_JS', 'const HUNTS_JS = `'], ['SELLGUARD', 'const SELLGUARD = `'], ['READ_BAG_IV', 'const READ_BAG_IV = `'], ['SELL_SAFE_POKES', 'const SELL_SAFE_POKES = `'], ['BUY_UB_BATCH', 'const BUY_UB_BATCH = qty => `'], ['LAYOUTS_JS', 'const LAYOUTS_JS = cfg => `']].forEach(([nome, marca]) => {
   const cru = pega(marca);
   if (cru == null) { ok(false, nome + ' sumiu do index.html'); return; }
   // o template literal e desescapado antes de rodar no painel; aqui fazemos o mesmo
@@ -124,6 +124,9 @@ ok(index.includes('id="protectItemsBtn"') && index.includes('id="protectOverlay"
 ok(index.includes("localStorage.setItem('protectedItemIds'") && index.includes('protectedItemIds.add(id)') && index.includes('protectedItemIds.delete(id)'), 'itens marcados e desmarcados ficam salvos');
 ok(index.includes('!protectedIds.has(String(x.itemId))') && index.includes('SELL_SAFE_ITEMS_V2([...protectedItemIds])'), 'venda de itens exclui toda protecao personalizada');
 ok(index.includes("blocked=/boss|key|card|picture|strange\\\\s+pheromone/i") && index.includes("!['heal','revive','stone'].includes"), 'protecao personalizada preserva todas as regras antigas');
+ok(index.includes('id="layoutsBtn"') && index.includes('data-layout="map"') && index.includes("gameLayouts = { map:true"), 'Layouts fica ao lado de Opcoes e inicia com mapa simplificado selecionado');
+ok(index.includes("it.image || it.icon || it.sprite || it.img") && index.includes('protectFallbackIcon'), 'catalogo protegido usa todos os campos de imagem e fallback oficial');
+ok(index.includes('id="refreshPediaItems"') && index.includes("fetch('/game/items.json',{cache:'no-store'})"), 'Opcoes atualiza itens e imagens da Pokepedia sem cache');
 
 try { fs.rmSync(path.join(RAIZ, '.teste-tmp'), { recursive: true, force: true }); } catch {}
 console.log(falhas ? '\n' + falhas + ' falha(s)' : '\nInicializacao: tudo certo');
