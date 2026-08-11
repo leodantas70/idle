@@ -127,8 +127,9 @@ ok(index.includes("blocked=/boss|key|card|picture|strange\\\\s+pheromone/i") && 
 ok(index.includes('id="layoutsBtn"') && index.includes('data-layout="map"') && index.includes("gameLayouts = { map:true"), 'Layouts fica ao lado de Opcoes e inicia com mapa simplificado selecionado');
 ok(index.includes("it.image || it.icon || it.sprite || it.img") && index.includes('protectFallbackIcon'), 'catalogo protegido usa todos os campos de imagem e fallback oficial');
 ok(index.includes('id="refreshPediaItems"') && index.includes("fetch('/game/items.json',{cache:'no-store'})"), 'Opcoes atualiza itens e imagens da Pokepedia sem cache');
-ok(index.includes('const activeMoves=') && index.includes("fetch('/game/creatures.json')") && index.includes("' · ⚡ '+x.ef+'x'"), 'mapa simplificado calcula vantagem pelos golpes do Pokemon ativo');
-ok(index.includes('else if(v===2)v=2.5') && index.includes('else if(v>=4)v=5.5'), 'mapa aplica multiplicadores especiais 2.5x e 5.5x do layout Interface');
+ok(index.includes('const activeMoves=') && index.includes("fetch('/game/creatures.json')") && index.includes("badge.textContent='⚡ '+x.ef+'x'"), 'mapa simplificado calcula vantagem pelos golpes do Pokemon ativo');
+ok(index.includes('else if(v===2)v=2.5') && index.includes('else if(v>=4)v=5'), 'mapa aplica multiplicadores especiais 2.5x e 5x do layout Interface');
+ok(index.includes('.pg-eff.adv') && index.includes('.pg-eff.max') && index.includes("x.ef>=5?'max':'adv'"), 'mapa diferencia visualmente efetividade 2.5x e 5x');
 
 try { fs.rmSync(path.join(RAIZ, '.teste-tmp'), { recursive: true, force: true }); } catch {}
 console.log(falhas ? '\n' + falhas + ' falha(s)' : '\nInicializacao: tudo certo');
