@@ -1,5 +1,16 @@
 node_modules/
 dist/
+release-electron/
+release-electron-v2/
+release-electron-v3/
+release-installer/
+release-installer-squirrel/
+release-installer-squirrel-v2/
+release-installer-flat/
+release-pokegrid/
+release/
+release-update-test*/
+release-fix*/
 *.zip
 *.log
 .update-needs-install

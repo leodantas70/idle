@@ -20,6 +20,8 @@
   #topbar .logo { display: flex; align-items: center; gap: 8px; margin-right: auto; font-family: "Segoe UI Variable Display", "Segoe UI", sans-serif; font-size: 15px; font-weight: 800; letter-spacing: 2.5px; }
   #topbar .logo svg { display: block; }
   #topbar .logo .ver { font-size: 10px; font-weight: 400; letter-spacing: 0; color: #6e7681; align-self: flex-end; padding-bottom: 1px; }
+  #appUpdate { display:none; padding: 3px 8px; border-color:#2ea043; background:#17351f; color:#7ee787; font-size:10px; white-space:nowrap; }
+  #appUpdate:hover { background:#238636; color:#fff; }
   button {
     background: #21262d; color: #e6edf3; border: 1px solid #30363d;
     border-radius: 6px; padding: 6px 12px; font-size: 12px; font-weight: 600; letter-spacing: .2px; cursor: pointer;
@@ -68,6 +70,26 @@
   .pi-item .pi-name { min-width: 0; overflow-wrap: anywhere; font-size: 12px; font-weight: 650; }
   .pi-item .pi-id { display: block; margin-top: 2px; color: #6e7681; font-size: 10px; font-weight: 400; }
   #protectEmpty { grid-column: 1 / -1; padding: 50px 12px; color: #8b949e; text-align: center; }
+  #pokemonOverlay { position: fixed; inset: 0; z-index: 480; display: none; align-items: center; justify-content: center; padding: 28px; background: rgba(3,7,12,.82); backdrop-filter: blur(3px); }
+  #pokemonOverlay.show { display: flex; }
+  #pokemonModal { width: min(1120px, 96vw); height: min(820px, 92vh); display: flex; flex-direction: column; overflow: hidden; background: #121820; border: 1px solid #3b4654; border-radius: 12px; box-shadow: 0 24px 70px rgba(0,0,0,.65); }
+  #pokemonModal .pi-head { display: flex; align-items: center; gap: 12px; padding: 15px 18px; border-bottom: 1px solid #30363d; }
+  #pokemonModal .pi-head h2 { flex: 1; font-size: 17px; }
+  #pokemonModal .pi-help { padding: 0 18px 12px; color: #9da7b3; font-size: 12px; line-height: 1.45; }
+  #pokemonModal .pi-tools { display: grid; grid-template-columns: minmax(180px, 1fr) 170px 140px 140px 170px auto; gap: 9px; padding: 0 18px 13px; }
+  #pokemonModal input, #pokemonModal select { min-width: 0; padding: 8px 10px; color: #e6edf3; background: #0d1117; border: 1px solid #30363d; border-radius: 7px; }
+  #pokemonModal input:focus, #pokemonModal select:focus { outline: none; border-color: #388bfd; }
+  #pokemonCount { align-self: center; color: #79c0ff; font-size: 12px; white-space: nowrap; }
+  #pokemonGrid { flex: 1; overflow: auto; padding: 4px 18px 18px; display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); align-content: start; gap: 8px; }
+  .pk-item { min-height: 70px; display: flex; align-items: center; gap: 10px; padding: 8px 10px; background: #171e27; border: 1px solid #30363d; border-radius: 8px; }
+  .pk-item:hover { border-color: #596579; background: #1c2530; }
+  .pk-item .pk-lock { margin-left: auto; flex: none; padding: 4px 5px; border: 0; border-radius: 6px; color: #f2c665; background: transparent; cursor: pointer; font-size: 16px; line-height: 1; }
+  .pk-item .pk-lock:hover { background: #263342; }
+  .pk-item.pk-busy { opacity: .65; pointer-events: none; }
+  .pk-item img { width: 58px; height: 58px; flex: none; object-fit: contain; image-rendering: pixelated; }
+  .pk-item .pk-name { min-width: 0; overflow-wrap: anywhere; font-size: 12px; font-weight: 650; }
+  .pk-item .pk-meta { display: block; margin-top: 3px; color: #8b949e; font-size: 10px; font-weight: 400; line-height: 1.45; }
+  #pokemonEmpty { grid-column: 1 / -1; padding: 50px 12px; color: #8b949e; text-align: center; }
   #layoutsOverlay { position:fixed; inset:0; z-index:470; display:none; align-items:center; justify-content:center; background:rgba(3,7,12,.82); }
   #layoutsOverlay.show { display:flex; }
   #layoutsModal { width:min(620px,92vw); max-height:88vh; overflow:auto; padding:18px; background:#121820; border:1px solid #3b4654; border-radius:12px; box-shadow:0 22px 65px rgba(0,0,0,.65); }
@@ -112,6 +134,9 @@
   .name { font-weight: 600; cursor: pointer; }
   .status { color: #8b949e; font-size: 11px; margin-right: auto; }
   .panel-header button { padding: 2px 8px; font-size: 11px; }
+  .panel-header .account-action { padding: 2px 6px; min-width: 26px; border: 1px solid #30363d; border-radius: 5px; background: #161b22; cursor: pointer; }
+  .panel-header .account-action:hover { background: #263241; border-color: #58a6ff; }
+  .panel-header .account-action.depot:hover { border-color: #3fb950; }
   .zpct { color: #8b949e; font-size: 11px; min-width: 32px; text-align: center; cursor: pointer; }
   .zpct:hover { color: #e6edf3; }
   webview { flex: 1; border: none; background: #000; }
@@ -326,6 +351,21 @@
   #ivCard .iv-mv .mv-p { margin-left: auto; color: #f0883e; font-variant-numeric: tabular-nums; flex: none; }
   #ivCard .iv-mv .mv-d { color: #55e6d3; font-variant-numeric: tabular-nums; flex: none; }
   #ivCard .iv-foot { display: flex; align-items: center; gap: 8px; margin-top: 11px; font-size: 11px; color: #6e7681; flex-wrap: wrap; }
+  #ivCard .iv-market { background: #12171e; border: 1px solid #2b3542; border-radius: 9px; padding: 9px 10px; margin-top: 11px; }
+  #ivCard .iv-market-h { display:flex; align-items:center; gap:7px; margin-bottom:7px; color:#f2c665; font-size:11px; font-weight:700; }
+  #ivCard .iv-market-h button { margin-left:auto; background:#172a3d; border:1px solid #388bfd; color:#79c0ff; border-radius:6px; padding:3px 7px; font-size:10px; cursor:pointer; }
+  #ivCard .iv-market-h button:hover { background:#1f4b75; color:#fff; }
+  #ivCard .iv-market-h button.is-loading { opacity:.8; cursor:wait; }
+  #ivCard .iv-market-h button.is-loading::before { content:'↻'; display:inline-block; margin-right:3px; animation:pg-market-spin 1s linear infinite; }
+  @keyframes pg-market-spin { to { transform:rotate(360deg); } }
+  #ivCard .iv-market-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:6px; }
+  #ivCard .iv-market-cell { background:#0b0f15; border:1px solid #21262d; border-radius:7px; padding:6px 7px; min-width:0; }
+  #ivCard .iv-market-cell:nth-child(1) { text-align:left; }
+  #ivCard .iv-market-cell:nth-child(2) { text-align:center; border-color:#388bfd; box-shadow:0 0 0 1px rgba(56,139,253,.18); }
+  #ivCard .iv-market-cell:nth-child(3) { text-align:right; }
+  #ivCard .iv-market-cell .k { color:#7d8590; font-size:9px; text-transform:uppercase; }
+  #ivCard .iv-market-cell .v { color:#e6edf3; font-size:12px; font-weight:700; margin-top:3px; line-height:1.4; }
+  #ivCard .iv-market-note { color:#7d8590; font-size:10px; line-height:1.45; margin-top:6px; }
   #ivCard .iv-vazio { padding: 26px 16px; text-align: center; color: #7d8590; font-size: 13px; line-height: 1.7; }
   /* Shiny CAPTURADO: o evento mais raro do jogo, então o aviso fica na tela até ser fechado */
   #shinyParty { position: fixed; top: 58px; left: 50%; /* abaixo da barra: nao cobre os botoes do app */ transform: translateX(-50%); z-index: 900; display: flex; flex-direction: column; gap: 8px; align-items: center; pointer-events: none; }
@@ -429,6 +469,35 @@
   .cd-ball-cell { display: flex; align-items: center; gap: 7px; }
   .cd-item-price { display: block; margin-top: 2px; color: #f2c665; font-size: 9px; font-weight: 500; white-space: nowrap; }
   .cd-account-gold { margin-left: 5px; color: #f2c665; font-size: 10px; white-space: nowrap; }
+  .cd-team-head { display:flex; align-items:flex-start; gap:8px; flex-wrap:nowrap; margin:9px 0 5px; color:#adbac7; font-size:12px; }
+  .cd-team-main { display:flex; flex-direction:column; align-items:flex-start; gap:5px; min-width:0; flex:1 1 auto; }
+  .cd-team-identity { display:flex; align-items:center; gap:5px; min-width:0; }
+  .cd-team-identity b { overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+  .cd-team-nav { display:flex; align-items:center; gap:5px; flex-wrap:wrap; }
+  .cd-team-balance { display:inline-flex; align-items:center; gap:5px; font-size:10px; font-weight:600; white-space:nowrap; }
+  .cd-team-balance .cd-dollar { color:#f2c665; }
+  .cd-team-balance .cd-diamond { color:#79c0ff; }
+  .cd-team-actions { display:flex; align-items:center; justify-content:flex-end; gap:6px; flex:1 1 360px; flex-wrap:wrap; }
+  .cd-team-sales { flex:0 0 auto; flex-direction:column; align-items:flex-end; gap:4px; }
+  .cd-team-sales button { width:max-content; max-width:100%; }
+  .cd-team-actions .cd-sell-stones { margin-left:auto; }
+  .cd-team-slot { display:inline-flex; align-items:center; justify-content:center; width:18px; height:18px; flex:none; border:1px solid #3b4654; border-radius:4px; color:#8b949e; font-size:10px; font-weight:700; }
+  .cd-team-empty { opacity:.55; cursor:default; }
+  #simpleChatDock { display:none; position:fixed; right:18px; bottom:18px; z-index:1200; width:min(390px,calc(100vw - 36px)); height:330px; flex-direction:column; background:#111820; border:1px solid #344454; border-radius:10px; box-shadow:0 12px 34px rgba(0,0,0,.5); overflow:hidden; }
+  body.cards-on #simpleChatDock.has-chat { display:flex; }
+  .sc-tabs { display:flex; gap:4px; padding:6px; background:#18222d; border-bottom:1px solid #2c3947; overflow-x:auto; }
+  .sc-tab { display:flex; align-items:center; gap:5px; max-width:150px; padding:5px 7px; border:1px solid #344454; border-radius:6px; background:#111820; color:#c9d1d9; font-size:10px; cursor:pointer; white-space:nowrap; }
+  .sc-tab.active { border-color:#388bfd; color:#fff; background:#1b3047; }
+  .sc-tab .sc-close { color:#f0883e; font-size:13px; line-height:10px; }
+  .sc-title { padding:7px 10px; color:#79c0ff; font-size:11px; font-weight:700; border-bottom:1px solid #263241; }
+  .sc-messages { flex:1; min-height:0; overflow:auto; padding:7px 9px; font-size:11px; }
+  .sc-msg { padding:4px 6px; margin:3px 0; border-radius:6px; background:#19232e; color:#d7e0e8; word-break:break-word; }
+  .sc-msg.mine { background:#17351f; color:#c9f7d1; text-align:right; }
+  .sc-empty { color:#7d8590; padding:14px 4px; text-align:center; }
+  .sc-compose { display:flex; gap:5px; padding:7px; border-top:1px solid #2c3947; }
+  .sc-account { width:108px; min-width:0; padding:7px 5px; background:#0d141b; color:#c9d1d9; border:1px solid #344454; border-radius:6px; }
+  .sc-compose input { flex:1; min-width:0; padding:7px 8px; background:#0d141b; color:#e6edf3; border:1px solid #344454; border-radius:6px; }
+  .sc-compose button { padding:6px 9px; border:1px solid #2ea043; border-radius:6px; background:#17351f; color:#7ee787; cursor:pointer; }
   .cd-ball-buy { background: #17351f; border: 1px solid #2ea043; border-radius: 5px; color: #7ee787; font-size: 10px; padding: 2px 6px; cursor: pointer; white-space: nowrap; }
   .cd-ball-buy:hover { background: #238636; color: #fff; }
   .cd-sell-safe { background: #3b1d20; border: 1px solid #da3633; border-radius: 6px; color: #ffb3ad; font-size: 11px; padding: 4px 9px; cursor: pointer; white-space: nowrap; }
@@ -440,6 +509,7 @@
   .cd-sell-stones:hover { background:#553098; color:#fff; }
   .cd-open-market { background: #172a3d; border: 1px solid #388bfd; border-radius: 6px; color: #79c0ff; font-size: 11px; padding: 4px 9px; cursor: pointer; white-space: nowrap; }
   .cd-open-market:hover { background: #1f4b75; color: #fff; }
+  .cd-open-market.is-busy, .cd-open-depot.is-busy, .cd-sell-safe.is-busy, .cd-sell-pokes.is-busy, .cd-sell-stones.is-busy, .cd-ball-buy.is-busy { opacity:.75; cursor:wait; }
   .cd-open-depot { background:#203127; border:1px solid #3fb950; border-radius:6px; color:#7ee787; font-size:11px; padding:4px 9px; cursor:pointer; white-space:nowrap; }
   .cd-open-depot:hover { background:#285f36; color:#fff; }
   .cd-dex-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(155px,1fr)); gap:6px; margin-top:8px; }
@@ -551,6 +621,7 @@
       </svg>
       POKEGRID
       <span class="ver" id="appVer"></span>
+      <button id="appUpdate" type="button" title="Atualizar o PokeGrid">⬆ Atualizar</button>
     </span>
     <button id="loginAll" class="primary">▶ Logar equipe</button>
     <button id="accounts">👤 Treinadores</button>
@@ -558,6 +629,7 @@
     <button id="dock" title="Mostra ou esconde o menu de ícones do jogo. F2 alterna no painel em foco.">🎛 Menu do jogo</button>
     <button id="statsBtn" title="Resumo da conta em foco (gold/h, XP/h, bag, drops)">📊 Painel</button>
     <button id="protectItemsBtn" title="Escolha itens que nunca poderão ser vendidos">🔒 Proteger itens</button>
+    <button id="pokemonBtn" title="Mostra os Pokémon de todas as contas com filtros">🎴 Pokémons</button>
     <button id="cardsBtn" title="Dashboard ultra leve: esconde o jogo e mostra só os números">🃏 Cartas</button>
     <button id="ivsBtn" title="Abre ou fecha a calculadora de IV (JustPokédex) em todos os painéis"><svg width="14" height="14" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" fill="#fff"/><path d="M2 12h20" stroke="#8f1408" stroke-width="3"/><circle cx="12" cy="12" r="3.4" fill="#fff" stroke="#8f1408" stroke-width="2.5"/></svg>IV's</button>
     <button id="layoutsBtn" title="Escolha quais partes visuais do jogo serão modificadas">🎨 Layouts</button>
@@ -617,6 +689,23 @@
         <span id="protectCount">0 protegidos</span>
       </div>
       <div id="protectItemsGrid"><div id="protectEmpty">Entre em pelo menos um personagem para carregar todos os itens do jogo.</div></div>
+    </div>
+  </div>
+  <div id="pokemonOverlay">
+    <div id="pokemonModal" role="dialog" aria-modal="true" aria-labelledby="pokemonTitle">
+      <div class="pi-head"><h2 id="pokemonTitle">🎴 Pokémons de todas as contas</h2><button id="pokemonClose">Fechar</button></div>
+      <div class="pi-help">Lista todos os Pokémon armazenados nas contas conectadas. Use os filtros para localizar por conta, nome, IV, raridade ou shiny.</div>
+      <div class="pi-tools">
+        <input id="pokemonSearch" type="search" placeholder="Filtrar pelo nome…" autocomplete="off">
+        <select id="pokemonAccount"><option value="-1">Todas as contas</option></select>
+        <input id="pokemonIv" type="number" min="0" max="192" placeholder="IV ≥" title="IV mínimo">
+        <select id="pokemonType" title="Filtrar por tipo"><option value="">Todos os tipos</option><option value="normal">Normal</option><option value="fire">Fogo</option><option value="water">Água</option><option value="electric">Elétrico</option><option value="grass">Grama</option><option value="ice">Gelo</option><option value="fighting">Lutador</option><option value="poison">Veneno</option><option value="ground">Terra</option><option value="flying">Voador</option><option value="psychic">Psíquico</option><option value="bug">Inseto</option><option value="rock">Pedra</option><option value="ghost">Fantasma</option><option value="dragon">Dragão</option><option value="dark">Sombrio</option><option value="steel">Aço</option><option value="fairy">Fada</option></select>
+        <select id="pokemonRarity" title="Raridade mínima"><option value="0">Qualquer raridade</option><option value="1">Comum ou melhor</option><option value="1.3">Rara ou melhor</option><option value="1.5">Épica ou melhor</option><option value="1.7">Lendária ou melhor</option><option value="2">Mítica ou melhor</option><option value="3">Anciã ou melhor</option></select>
+        <label class="pi-inp" title="Somente shiny">✨ <input id="pokemonShiny" type="checkbox"></label>
+        <select id="pokemonSort" title="Ordenar Pokémon"><option value="iv-desc">IV mais alto</option><option value="iv-asc">IV mais baixo</option><option value="level-desc">Level mais alto</option><option value="level-asc">Level mais baixo</option><option value="name-asc">Nome A–Z</option></select>
+        <span id="pokemonCount">0 exibidos</span>
+      </div>
+      <div id="pokemonGrid"><div id="pokemonEmpty">Abra uma conta para carregar os Pokémon.</div></div>
     </div>
   </div>
   <div id="overlay">
@@ -726,6 +815,7 @@ const HOME_URL  = 'https://poke.idleworld.online/';
 
   let accounts = [];
   const webviews = [];
+  let ultimoPainelFoco = 0;
   const off = [false, false, false, false];
   const lastLogin = [0, 0, 0, 0]; // cooldown do auto-login por painel (evita ressubmeter em loop)
   const deadT = [0, 0, 0, 0]; // ticks seguidos sem sessao viva: o jogo nao navega sozinho pro login
@@ -873,6 +963,8 @@ const HOME_URL  = 'https://poke.idleworld.online/';
           <span class="dot"></span>
           <span class="name"></span>
           <span class="status"></span>
+          <button class="account-action depot" title="Abrir Baú desta conta" aria-label="Abrir Baú desta conta">📦</button>
+          <button class="account-action market" title="Abrir Market desta conta" aria-label="Abrir Market desta conta">🏪</button>
           <button class="zo">−</button>
           <span class="zpct"></span>
           <button class="zi">+</button>
@@ -891,6 +983,7 @@ const HOME_URL  = 'https://poke.idleworld.online/';
       panel.appendChild(wv);
       grid.appendChild(panel);
       webviews.push(wv);
+      wv.addEventListener('focus', () => { ultimoPainelFoco = i; });
 
       const dot = panel.querySelector('.dot');
       const status = panel.querySelector('.status');
@@ -931,6 +1024,8 @@ const HOME_URL  = 'https://poke.idleworld.online/';
       zpct.onclick = () => setZoom(1);
       panel.querySelector('.zi').onclick = () => setZoom(zoom + 0.1);
       panel.querySelector('.zo').onclick = () => setZoom(zoom - 0.1);
+      bindBusyButton(panel.querySelector('.depot'), 'Abrindo…', '📦', () => openCharacterDepot(i));
+      bindBusyButton(panel.querySelector('.market'), 'Abrindo…', '🏪', () => openCharacterMarket(i));
 
       wv.addEventListener('dom-ready', () => {
         if (!off[i] && !falhou) { dot.className = 'dot ok'; status.textContent = t('stOnline'); fails = 0; alertedDown = false; } // carregou DE VERDADE: zera o watchdog (a pagina de erro tambem emite dom-ready)
@@ -951,9 +1046,8 @@ const HOME_URL  = 'https://poke.idleworld.online/';
 if(S.supBase){for(const id in S.supBase){const antes=S.supBase[id]||0,agora=(cur[id]!=null?cur[id]:0),d=antes-agora;if(d>0){const it=cat0[id]||{};S.supGold=(S.supGold||0)+d*(it.priceGold||it.npcPrice||0);S.supN=(S.supN||0)+d;}}}
 S.supBase=cur;if(S.picBase==null){S.picBase=now;}else{if(now>S.picBase){const doc=P.api['/game/items.json'];const it=doc&&doc.items&&doc.items.find(x=>x.id===59195);const d=S.drops[59195]||(S.drops[59195]={name:(it&&it.name)||'Rare Pokémon Picture',qty:0});d.qty+=(now-S.picBase);}S.picBase=now;}}else if(m.type==='chat'||m.type==='history'){const chS=(mm)=>{try{if(!mm||!mm.body)return;const re=/\\[poke!([A-Za-z0-9_-]+)\\]/g;let mt;while((mt=re.exec(mm.body))){try{const j=JSON.parse(atob(mt[1].replace(/-/g,'+').replace(/_/g,'/')));if(j&&j.k==='poke'){const CS=P.chatShares=P.chatShares||[];const N=(v)=>{v=Number(v);return isFinite(v)?v:0;};const cn=String(j.n||'?').slice(0,40),cf=String(mm.fromName||'').slice(0,40);if(!CS.some(c=>c.n===cn&&c.iv===N(j.iv)&&c.lv===N(j.lv)&&c.fr===cf)){CS.push({fr:cf,n:cn,sh:!!j.sh,lv:N(j.lv),q:N(j.q),iv:N(j.iv),pw:N(j.pw),t:Date.now()});if(CS.length>15)CS.shift();}}}catch(x){}}}catch(x){}};if(m.type==='chat')chS(m.msg);else['world','trade','help'].forEach(c2=>(m[c2]||[]).forEach(chS));}}}}catch(x){}});return s;};window.WebSocket.prototype=OW.prototype;['CONNECTING','OPEN','CLOSING','CLOSED'].forEach(k=>{try{window.WebSocket[k]=OW[k]}catch(x){}});const OF=window.fetch;window.fetch=function(...a){try{let H;const r0=a[0],ini=a[1];if(ini&&ini.headers)H=ini.headers;else if(r0&&typeof r0==='object'&&r0.headers)H=r0.headers;if(H){let au;if(typeof H.get==='function')au=H.get('authorization');else au=H.Authorization||H.authorization;if(au){auth=au;P.auth=au;}}}catch(x){}const p=OF.apply(this,a);try{let u=(a[0]&&a[0].url)||a[0];if(typeof u==='string'&&/\\/api\\/|items\\.json/.test(u)){p.then(r=>{const c=r.clone();c.json().then(j=>{const key=u.split('?')[0];if(key==='/api/game/used-balls'){if(j&&j.pokemons){P.shinyEnc=j.pokemons.reduce((s,p)=>s+(p.shiny?(p.attempts||0):0),0);P.usedList=j.pokemons.map(p=>({sid:p.speciesId,name:p.name,shiny:!!p.shiny,attempts:p.attempts||0,total:p.total||0,caught:!!p.caught}));}return;}if(key==='/api/characters/me'&&(!j||!j.character))return;P.api[key]=j}).catch(()=>{})}).catch(()=>{})}}catch(x){}return p;};const poll=()=>{try{while(P.catchLog&&P.catchLog.length>400)P.catchLog.shift();while(P.shinyLog&&P.shinyLog.length>300)P.shinyLog.shift();const o=auth?{headers:{Authorization:auth}}:undefined;fetch('/api/characters/me',o).catch(()=>{});fetch('/api/game/used-balls',o).catch(()=>{});try{if(P.sock&&P.sock.readyState===1){P.sock.send(JSON.stringify({type:'inv-get'}));P.sock.send(JSON.stringify({type:'analyzer-get'}));}}catch(x){}}catch(x){}};setInterval(poll,30000);setTimeout(poll,9000);})()`).catch(() => {}); // coletor de estado + sessao (refetch autenticado de gold/nivel a cada 30s)
           wv.executeJavaScript(`(()=>{if(window.__pgAuthCapture)return;window.__pgAuthCapture=1;const f=window.fetch;window.fetch=function(...a){try{const r=a[0],o=a[1],h=(o&&o.headers)||(r&&typeof r==='object'&&r.headers);let v;if(h){if(typeof h.get==='function')v=h.get('authorization');else v=h.Authorization||h.authorization;}if(v)window.__pgAuth=v;}catch(x){}return f.apply(this,a);};})()`).catch(() => {});
-          wv.executeJavaScript(`(()=>{if(window.__pgAnalyzerPoll)return;window.__pgAnalyzerPoll=setInterval(()=>{try{const P=window.__poke;if(P&&P.sock&&P.sock.readyState===1)P.sock.send(JSON.stringify({type:'analyzer-get'}));}catch(x){}},30000);try{const P=window.__poke;if(P&&P.sock&&P.sock.readyState===1)P.sock.send(JSON.stringify({type:'analyzer-get'}));}catch(x){}})()`).catch(() => {});
           /* A segunda copia do coletor veio do lado oficial do conflito. O coletor personalizado
-             acima continua ativo; o polling do analyzer foi incorporado separadamente. Inativa:
+             acima continua ativo; o polling do analyzer já está incorporado nele. Inativa:
 S.supBase=cur;if(S.picBase==null){S.picBase=now;}else{if(now>S.picBase){const doc=P.api['/game/items.json'];const it=doc&&doc.items&&doc.items.find(x=>x.id===59195);const d=S.drops[59195]||(S.drops[59195]={name:(it&&it.name)||'Rare Pokémon Picture',qty:0});d.qty+=(now-S.picBase);}S.picBase=now;}}else if(m.type==='chat'||m.type==='history'){const chS=(mm)=>{try{if(!mm||!mm.body)return;const re=/\\[poke!([A-Za-z0-9_-]+)\\]/g;let mt;while((mt=re.exec(mm.body))){try{const j=JSON.parse(atob(mt[1].replace(/-/g,'+').replace(/_/g,'/')));if(j&&j.k==='poke'){const CS=P.chatShares=P.chatShares||[];const N=(v)=>{v=Number(v);return isFinite(v)?v:0;};const cn=String(j.n||'?').slice(0,40),cf=String(mm.fromName||'').slice(0,40);if(!CS.some(c=>c.n===cn&&c.iv===N(j.iv)&&c.lv===N(j.lv)&&c.fr===cf)){CS.push({fr:cf,n:cn,sh:!!j.sh,lv:N(j.lv),q:N(j.q),iv:N(j.iv),pw:N(j.pw),t:Date.now()});if(CS.length>15)CS.shift();}}}catch(x){}}}catch(x){}};if(m.type==='chat')chS(m.msg);else['world','trade','help'].forEach(c2=>(m[c2]||[]).forEach(chS));}}}}catch(x){}});return s;};window.WebSocket.prototype=OW.prototype;['CONNECTING','OPEN','CLOSING','CLOSED'].forEach(k=>{try{window.WebSocket[k]=OW[k]}catch(x){}});const OF=window.fetch;window.fetch=function(...a){try{let H;const r0=a[0],ini=a[1];if(ini&&ini.headers)H=ini.headers;else if(r0&&typeof r0==='object'&&r0.headers)H=r0.headers;if(H){let au;if(typeof H.get==='function')au=H.get('authorization');else au=H.Authorization||H.authorization;if(au)auth=au;}}catch(x){}const p=OF.apply(this,a);try{let u=(a[0]&&a[0].url)||a[0];if(typeof u==='string'&&/\\/api\\/|items\\.json/.test(u)){p.then(r=>{const c=r.clone();c.json().then(j=>{const key=u.split('?')[0];if(key==='/api/game/used-balls'){if(j&&j.pokemons){P.shinyEnc=j.pokemons.reduce((s,p)=>s+(p.shiny?(p.attempts||0):0),0);P.usedList=j.pokemons.map(p=>({sid:p.speciesId,name:p.name,shiny:!!p.shiny,attempts:p.attempts||0,total:p.total||0,caught:!!p.caught}));}return;}if(key==='/api/characters/me'&&(!j||!j.character))return;P.api[key]=j}).catch(()=>{})}).catch(()=>{})}}catch(x){}return p;};const poll=()=>{try{const o=auth?{headers:{Authorization:auth}}:undefined;fetch('/api/characters/me',o).catch(()=>{});fetch('/api/game/used-balls',o).catch(()=>{});try{if(P.sock&&P.sock.readyState===1){P.sock.send(JSON.stringify({type:'inv-get'}));P.sock.send(JSON.stringify({type:'analyzer-get'}));}}catch(x){}}catch(x){}};setInterval(poll,30000);setTimeout(poll,9000);})()`).catch(() => {}); // coletor de estado + sessao (refetch autenticado de gold/nivel a cada 30s)
           /* fim da copia inativa */
           wv.executeJavaScript(ecoScript(ecoFps())).catch(() => {});
@@ -967,6 +1061,7 @@ S.supBase=cur;if(S.picBase==null){S.picBase=now;}else{if(now>S.picBase){const do
           wv.executeJavaScript('window.__pgSellGuardOn=' + (sellGuardOn ? 'true' : 'false') + ';window.__pgSellLock=' + JSON.stringify(sellLock)).catch(() => {});
           wv.executeJavaScript(QOL_UI).catch(() => {});
           wv.executeJavaScript(chatScript(chatHidden || cardsOn)).catch(() => {});
+          wv.executeJavaScript(DIRECT_CHAT_SCRIPT).catch(() => {});
           wv.executeJavaScript(dockScript(dockHidden)).catch(() => {});
           applyGameLayoutsTo(i);
           // so na tela de login, pra nao rodar a toa dentro do jogo
@@ -1027,6 +1122,13 @@ S.supBase=cur;if(S.picBase==null){S.picBase=now;}else{if(now>S.picBase){const do
   }
   countBtn.onclick = () => setCount(count === 4 ? 1 : count + 1); // cicla 4 -> 1 -> 2 -> 3 -> 4
 
+  function focarJogo(i = ultimoPainelFoco) {
+    const w = webviews[i];
+    if (!w || off[i]) return;
+    ultimoPainelFoco = i;
+    try { w.focus(); } catch {}
+  }
+
   function toggleExpand(i) {
     const p = grid.children[i];
     if (!p) return; // painel nao existe (rodando menos de 4)
@@ -1034,6 +1136,14 @@ S.supBase=cur;if(S.picBase==null){S.picBase=now;}else{if(now>S.picBase){const do
     [...grid.children].forEach(c => c.classList.remove('expanded')); // um por vez
     if (on) p.classList.add('expanded');
     ajustaProporcao(); // expandir/voltar muda o espaco do painel
+    focarJogo(i);
+  }
+  function maximizaPainel(i) {
+    const p = grid.children[i];
+    if (!p) return;
+    if (!p.classList.contains('expanded')) p.classList.add('expanded');
+    ajustaProporcao();
+    focarJogo(i);
   }
 
   function togglePower(i) {
@@ -1111,6 +1221,11 @@ S.supBase=cur;if(S.picBase==null){S.picBase=now;}else{if(now>S.picBase){const do
 
   // ----- Modal de contas -----
   const overlay = document.getElementById('overlay');
+  let accSaveTimer = 0;
+  function scheduleAccountSave() {
+    clearTimeout(accSaveTimer);
+    accSaveTimer = setTimeout(() => { save().catch(() => {}); }, 350);
+  }
   function openAccounts() {
     const rows = document.getElementById('accRows');
     rows.innerHTML = '';
@@ -1124,6 +1239,14 @@ S.supBase=cur;if(S.picBase==null){S.picBase=now;}else{if(now>S.picBase){const do
         <button class="acc-del" title="${t('accClear')}">🗑</button><button class="acc-wipe" title="${t('accWipe')}">🧹</button>`;
       const [vn, ve, vs] = row.querySelectorAll('input'); // valores por propriedade: nunca viram HTML
       vn.value = c.name || ''; ve.value = c.email || ''; vs.value = c.senha || '';
+      row.querySelectorAll('input').forEach(inp => inp.addEventListener('input', () => {
+        accounts[+inp.dataset.i][inp.dataset.f] = inp.value;
+        if (inp.dataset.f === 'name') {
+          const header = grid.querySelectorAll('.name')[+inp.dataset.i];
+          if (header) header.textContent = inp.value || defName(+inp.dataset.i);
+        }
+        scheduleAccountSave();
+      }));
       row.querySelector('.acc-del').onclick = () => { vn.value = ''; ve.value = ''; vs.value = ''; vn.focus(); };
   row.querySelector('.acc-wipe').onclick = async () => {
     if (!window.confirm(t('accWipeConfirm').replace('{n}', () => tabNames[i] || stName(i)))) return;
@@ -1137,8 +1260,8 @@ S.supBase=cur;if(S.picBase==null){S.picBase=now;}else{if(now>S.picBase){const do
     overlay.classList.add('show');
   }
   document.getElementById('accounts').onclick = openAccounts;
-  document.getElementById('accCancel').onclick = () => overlay.classList.remove('show');
-  overlay.onclick = (e) => { if (e.target === overlay) overlay.classList.remove('show'); };
+  document.getElementById('accCancel').onclick = () => { overlay.classList.remove('show'); focarJogo(); };
+  overlay.onclick = (e) => { if (e.target === overlay) { overlay.classList.remove('show'); focarJogo(); } };
   document.getElementById('accSave').onclick = async () => {
     document.querySelectorAll('#accRows input').forEach(inp => {
       accounts[+inp.dataset.i][inp.dataset.f] = inp.value;
@@ -1146,6 +1269,7 @@ S.supBase=cur;if(S.picBase==null){S.picBase=now;}else{if(now>S.picBase){const do
     grid.querySelectorAll('.name').forEach((el, i) => el.textContent = accounts[i].name || defName(i));
     if (!(await save())) { window.alert(t('accSaveErr')); return; } // nao fecha o modal: a senha nao foi gravada no disco
     overlay.classList.remove('show');
+    focarJogo();
   };
 
   // ----- Topbar -----
@@ -1164,6 +1288,8 @@ S.supBase=cur;if(S.picBase==null){S.picBase=now;}else{if(now>S.picBase){const do
   // funcao, nao constante: o READ_STATE so e declarado mais abaixo; no dom-ready ja existe
   const PUSH_STATE = () => '(()=>{if(window.__pgPush)return;window.__pgPush=1;setInterval(()=>{try{const d=' + READ_STATE + ';if(d&&d.ok)console.log("__PGST__"+JSON.stringify(d))}catch(x){}},10000)})()';
   const stCache = {};
+  const bagIvCache = [];
+  const BAG_IV_CACHE_MS = 30000;
   // Depot por conta (pedido do Semai: "aparece o depot da familia?"). Busca preguicosa: so com o
   // Simples aberto e a secao de inventario visivel, no maximo a cada 2 min por conta. A resposta
   // vem de codigo injetado, entao e saneada: so chaves simples, quantidade > 0, teto de 500 itens.
@@ -1192,7 +1318,7 @@ S.supBase=cur;if(S.picBase==null){S.picBase=now;}else{if(now>S.picBase){const do
     d.a = a;
     d.name = String(d.name || '').slice(0, 40); d.cid = String(d.cid || '').slice(0, 60); d.hunt = String(d.hunt || '').slice(0, 60);
     ['catchLog', 'usedList', 'team', 'chatShares'].forEach(k => d[k] = (Array.isArray(d[k]) ? d[k] : []).slice(0, 120)
-      .map(e => { if (e && typeof e === 'object') { for (const p2 in e) if (typeof e[p2] === 'string') e[p2] = e[p2].slice(0, 80); } return e; }));
+      .map(e => { if (e && typeof e === 'object') { for (const p2 in e) if (typeof e[p2] === 'string') e[p2] = e[p2].slice(0, p2 === 'body' ? 500 : 80); } return e; }));
     ['gold', 'diamonds', 'balls', 'potions', 'revives', 'shinyEnc', 'level', 'ballPrice'].forEach(k => d[k] = num(d[k]));
     const im = d.invMap && typeof d.invMap === 'object' && !Array.isArray(d.invMap) ? d.invMap : {};
     const inv2 = {}; let nInv = 0;
@@ -1216,13 +1342,38 @@ S.supBase=cur;if(S.picBase==null){S.picBase=now;}else{if(now>S.picBase){const do
     window.__eco.fps = ${fps};
   })()`;
   // Modo Cartas: no ultra leve o canvas do jogo some e o rAF cai pra 1fps (o farm e do servidor)
-  let cardsOn = false, cdHtmlAnt = ''; // sempre comeca desligado: com o jogo escondido nao dava pra logar/resolver captcha
+  const PERF_DEFAULTS = { depotIv: false, pokedex: false, chat: false, trend: false, market: false, images: false };
+  let perfCfg = { low: false, modules: { ...PERF_DEFAULTS } };
+  try { const savedPerf = lsObj('perfCfg'); perfCfg = { low: !!savedPerf.low, modules: { ...PERF_DEFAULTS, ...(savedPerf.modules || {}) } }; } catch {}
+  const perfOn = name => !perfCfg.low || perfCfg.modules[name] !== false;
+  const savePerfCfg = () => { try { lsSet('perfCfg', JSON.stringify(perfCfg)); } catch {} };
+  let cardsOn = false, cdHtmlAnt = '', simpleDiamondQuote = null, simpleDiamondBusy = false, simpleDiamondAt = 0, simpleDiamondHist = lsArr('simpleDiamondHist').filter(p => p && Number.isFinite(+p.t) && Number.isFinite(+p.v) && +p.v > 0).slice(-720); // sempre comeca desligado: com o jogo escondido nao dava pra logar/resolver captcha
   // ultra leve: esconde o que pinta (canvas/vídeo) e mata animações/transições CSS (corta paint/GPU).
   // NÃO mexe em WebSocket/timers do jogo, então o farm (que é do servidor) continua igual.
   const ultraScript = (on) => on
     ? `(()=>{let s=document.getElementById('pg-ultra');if(!s){s=document.createElement('style');s.id='pg-ultra';document.head.appendChild(s);}s.textContent='canvas,video{display:none !important} *{animation:none !important;transition:none !important;will-change:auto !important}';})()`
     : `(()=>{const s=document.getElementById('pg-ultra');if(s)s.remove();})()`;
   const ecoFps = () => cardsOn ? 1 : (eco ? 15 : 0);
+  async function atualizaCotacaoDiamante() {
+    if (!cardsOn || !perfOn('market') || simpleDiamondBusy || Date.now() - simpleDiamondAt < 55000) return;
+    const indices = webviews.map((w, k) => w && !off[k] ? k : -1).filter(k => k >= 0);
+    if (!indices.length) return;
+    simpleDiamondBusy = true; simpleDiamondAt = Date.now();
+    try {
+      for (const i of indices) {
+        const r = await webviews[i].executeJavaScript('window.__pgIv && window.__pgIv.diamond()');
+        if (r && r.diamante && Number.isFinite(+r.diamante.goldPorDiamante) && +r.diamante.goldPorDiamante > 0) {
+          simpleDiamondQuote = r.diamante;
+          simpleDiamondHist.push({ t: Date.now(), v: +r.diamante.goldPorDiamante });
+          simpleDiamondHist = simpleDiamondHist.filter(p => p.t > Date.now() - 24 * 3600e3).slice(-720);
+          lsSet('simpleDiamondHist', JSON.stringify(simpleDiamondHist));
+          cdHtmlAnt = '';
+          if (cardsOn) refreshCards(true);
+          break;
+        }
+      }
+    } catch {} finally { simpleDiamondBusy = false; }
+  }
   function applyEco() {
     ecoBtn.textContent = eco ? t('eco') : t('ecoOff');
     ecoBtn.classList.toggle('on', eco);
@@ -1335,7 +1486,9 @@ S.supBase=cur;if(S.picBase==null){S.picBase=now;}else{if(now>S.picBase){const do
         });
       } catch (x) {}
     }
-    new MutationObserver(() => { dex(); mercado(); }).observe(document.body, { childList: true, subtree: true });
+    let pgObsTimer = 0;
+    const pgObsQueue = () => { if (pgObsTimer) return; pgObsTimer = setTimeout(() => { pgObsTimer = 0; dex(); mercado(); }, 120); };
+    new MutationObserver(pgObsQueue).observe(document.body, { childList: true, subtree: true });
   })()`;
 
   // ----- Fecha o popup de promoção (<div class="promo-overlay"> com <button class="promo-close">) -----
@@ -1375,14 +1528,21 @@ S.supBase=cur;if(S.picBase==null){S.picBase=now;}else{if(now>S.picBase){const do
     const aplica = () => { const c = achaChat(); if (c) { c.dataset.pgchat = '1'; c.style.display = ${esconder} ? 'none' : ''; } };
     if (window.__chatObs) { window.__chatObs.disconnect(); window.__chatObs = null; }
     aplica();
-    if (${esconder}) { window.__chatObs = new MutationObserver(aplica); window.__chatObs.observe(document.documentElement, { childList: true, subtree: true }); }
+    if (${esconder}) {
+      let chatTimer = 0;
+      const agendaChat = () => { clearTimeout(chatTimer); chatTimer = setTimeout(aplica, 120); };
+      window.__chatObs = new MutationObserver(agendaChat);
+      window.__chatObs.observe(document.documentElement, { childList: true, subtree: true });
+    }
   })()`;
+  const DIRECT_CHAT_SCRIPT = `(()=>{try{const P=window.__poke;if(!P||P.__pgDirectChat)return;P.__pgDirectChat=1;const save=(mm,forced)=>{try{if(!mm||!mm.body)return;const body=String(mm.body).slice(0,500),from=String(mm.fromName||mm.senderName||mm.from||'').slice(0,60),to=String(mm.toName||mm.recipientName||mm.to||'').slice(0,60);const shares=P.chatShares=P.chatShares||[],re=/\\[poke!([A-Za-z0-9_-]+)\\]/g;let mt;while((mt=re.exec(body))){try{const j=JSON.parse(atob(mt[1].replace(/-/g,'+').replace(/_/g,'/')));if(j&&j.k==='poke'){const n=String(j.n||'?').slice(0,40),iv=Number(j.iv)||0,lv=Number(j.lv)||0,old=shares.find(x=>x.n===n&&x.iv===iv&&x.lv===lv&&x.fr===from);if(old){old.body=body;old.to=to;}else{shares.push({fr:from,n,sh:!!j.sh,lv,q:Number(j.q)||0,iv,pw:Number(j.pw)||0,body,to,t:Date.now()});if(shares.length>15)shares.shift();}}}catch(x){}}const direct=P.chatDirect=P.chatDirect||[];if((forced||to)&&from&&body&&!body.includes('[poke!')){const old=direct.find(x=>x.from===from&&x.to===to&&x.body===body);if(!old)direct.push({from,to,body,t:Date.now()});if(direct.length>120)direct.splice(0,direct.length-120);}}catch(x){}};const attach=()=>{const s=P.sock;if(!s||s.readyState!==1||s.__pgDirectChat)return;s.__pgDirectChat=1;s.addEventListener('message',e=>{try{const m=JSON.parse(e.data);if(m&&m.msg)save(m.msg,!!(m.msg.toName||m.msg.recipientName||m.msg.to));['private','whisper','dm'].forEach(k=>{if(m&&Array.isArray(m[k]))m[k].forEach(x=>save(x,true));});}catch(x){}});};attach();setInterval(attach,2000);}catch(x){}})()`;
+  const READ_DIRECT_CHAT = `(()=>{const P=window.__poke;return P&&Array.isArray(P.chatDirect)?P.chatDirect.slice(-120):[]})()`;
   const chatBtn = document.getElementById('chat');
   let chatHidden = lsGet('chatHidden') !== '0'; // fechado por padrao
   function applyChat() {
     chatBtn.textContent = chatHidden ? t('chatHidden') : t('chatShown');
     chatBtn.classList.toggle('on', !chatHidden);
-    webviews.forEach((w, i) => { if (off[i]) return; try { w.executeJavaScript(chatScript(chatHidden || cardsOn)).catch(() => {}); } catch {} });
+    webviews.forEach((w, i) => { if (off[i]) return; try { w.executeJavaScript(chatScript(chatHidden || cardsOn)).catch(() => {}); w.executeJavaScript(DIRECT_CHAT_SCRIPT).catch(() => {}); } catch {} });
     lsSet('chatHidden', chatHidden ? '1' : '0');
   }
   chatBtn.onclick = () => { chatHidden = !chatHidden; applyChat(); };
@@ -1407,7 +1567,12 @@ S.supBase=cur;if(S.picBase==null){S.picBase=now;}else{if(now>S.picBase){const do
   const dockScript = (esconder) => `(() => {
     window.__dockHide = ${esconder};
     const set = () => { const d = document.querySelector('nav.game-dock'); if (d) d.style.display = window.__dockHide ? 'none' : ''; };
-    if (!window.__dockObs) { window.__dockObs = new MutationObserver(set); window.__dockObs.observe(document.documentElement, { childList: true, subtree: true }); }
+    if (!window.__dockObs) {
+      let dockTimer = 0;
+      const agendaDock = () => { clearTimeout(dockTimer); dockTimer = setTimeout(set, 120); };
+      window.__dockObs = new MutationObserver(agendaDock);
+      window.__dockObs.observe(document.documentElement, { childList: true, subtree: true });
+    }
     if (!window.__dockKey) {
       window.__dockKey = true;
       addEventListener('keydown', (e) => {
@@ -1435,7 +1600,7 @@ S.supBase=cur;if(S.picBase==null){S.picBase=now;}else{if(now>S.picBase){const do
     const ID = 'pg-clean'; let s = document.getElementById(ID);
     if (!${on}) { if (s) s.remove(); return; }
     if (!s) { s = document.createElement('style'); s.id = ID; document.head.appendChild(s); }
-    s.textContent = '.cap-panel{display:none !important}'
+    s.textContent = '.cap-panel,.kc-stack{display:none !important}'
       + '.ah-panel,.game-hud-tl,nav.game-dock{opacity:0 !important;transition:opacity .18s ease !important}'
       + '.ah-panel:hover,.game-hud-tl:hover,nav.game-dock:hover{opacity:1 !important}';
   })()`;
@@ -1977,17 +2142,19 @@ return {live,hasBalls,hasInv,balls,potions,revives,prevHunt:resumo(P.prev),shiny
     if (r.kills > 0 && !stallOn[i] && alertsOn && now - (lastKT[i] != null ? lastKT[i] : now) > 600e3) { stallOn[i] = true; alerta(i, 'msgStalled'); }
   }
 
-  const pendA = [0, 0, 0, 0]; // ticks seguidos sem resposta (renderer travado deixa a promise pendente pra sempre)
+  const pendA = [0, 0, 0, 0], alertBusy = [false, false, false, false]; // ticks seguidos sem resposta (renderer travado deixa a promise pendente pra sempre)
   const sessSnap = []; // fotografia da sessao por conta: re-semeia o coletor apos reload (o jogo segue no servidor)
   setInterval(() => {
     webviews.forEach((w, i) => {
       if (off[i]) { pendA[i] = 0; return; }
+      if (alertBusy[i]) return;
       if (++pendA[i] >= 10) { // 60s sem nenhuma resposta: painel travado, recarrega sozinho
         pendA[i] = 0;
         try { window.pokeAPI.logError('painel', 'painel ' + (i + 1) + ' sem responder ha 60s, recarregando'); } catch {}
         try { w.reload(); } catch {}
         return;
       }
+      alertBusy[i] = true;
       w.executeJavaScript(READ_ALERTS).then(r => {
         pendA[i] = 0;
         if (!r) return;
@@ -2017,7 +2184,7 @@ return {live,hasBalls,hasInv,balls,potions,revives,prevHunt:resumo(P.prev),shiny
         // cada aviso depende do dado que ele mede: inventario ainda carregando nao vale como "acabou"
         if (r.hasBalls) checkLow(i, 'balls', r.balls, BALL_MIN, 'msgBallsLow');
         if (r.hasInv) { checkLow(i, 'potions', r.potions, POTION_MIN, 'msgPotionsLow'); checkLow(i, 'revives', r.revives, REVIVE_MIN, 'msgRevivesLow'); }
-      }).catch(() => { pendA[i] = 0; }); // rejeicao rapida (navegando/crash) nao e travamento: outros watchdogs cuidam
+      }).catch(() => { pendA[i] = 0; }).finally(() => { alertBusy[i] = false; }); // rejeicao rapida (navegando/crash) nao e travamento: outros watchdogs cuidam
     });
   }, 6000);
 
@@ -2082,8 +2249,9 @@ return {live,hasBalls,hasInv,balls,potions,revives,prevHunt:resumo(P.prev),shiny
   window.addEventListener('keydown', (e) => { if (e.key === 'Escape') sairDoFoco(); });
   window.pokeAPI?.onHotkey?.((k) => {
     if (k === 'mute') muteBtn.click();
+    else if (k === 'focus') focarJogo();
     else if (k === 'collapse') sairDoFoco();
-    else if (k.lastIndexOf('ctx', 0) === 0) { // clique direito no jogo: modo foco
+    else if (k.lastIndexOf('ctx', 0) === 0) { // Ctrl + clique direito: maximiza ou restaura a conta sob o cursor
       const id = +k.slice(3);
       const ix = webviews.findIndex(w => { try { return w && w.getWebContentsId() === id; } catch { return false; } });
       if (ix >= 0) toggleExpand(ix);
@@ -2092,37 +2260,39 @@ return {live,hasBalls,hasInv,balls,potions,revives,prevHunt:resumo(P.prev),shiny
   });
 
   document.getElementById('reloadAll').onclick = () => webviews.forEach((w, i) => { if (!off[i]) { try { w.reloadIgnoringCache(); } catch { w.reload(); } } });
-  document.getElementById('faqBtn').onclick = () => window.open('https://github.com/leodantas70/idle/blob/master/FAQ.md');
+  document.getElementById('faqBtn').onclick = () => window.open('https://github.com/edilsonbim/PokeGrid-source-fork/blob/main/FAQ.md');
   document.getElementById('reloadUi').onclick = () => location.reload();
-  document.getElementById('manBtn').onclick = () => window.open('https://github.com/leodantas70/idle/blob/master/MANUAL.md');
-  // versao aberta, lida da propria UA (o Electron poe PokeGrid/x.y.z nela; zero IPC)
+  document.getElementById('manBtn').onclick = () => window.open('https://github.com/edilsonbim/PokeGrid-source-fork/blob/main/MANUAL.md');
+  // Versão e atualização do aplicativo instalado. A troca é feita pelo processo principal,
+  // que baixa o instalador e só substitui os arquivos depois que esta janela fechar.
   try {
     const vAtual = window.pokeAPI && window.pokeAPI.appVersion;
     const elVer = document.getElementById('appVer');
     if (vAtual) elVer.textContent = 'v' + vAtual;
-    // Aviso de versao nova, 1x/dia. Nasceu do incidente 1.5.5: quem usa a versao sem executavel
-    // (sem o avisador do instalador) ficou preso numa versao quebrada sem saber.
-    const vMaior = (a, b) => { const A = String(a).split('.'), B = String(b).split('.'); for (let k = 0; k < 3; k++) { if ((+A[k] || 0) > (+B[k] || 0)) return true; if ((+A[k] || 0) < (+B[k] || 0)) return false; } return false; };
-    const vMostra = (tag) => {
-      if (!vAtual || !/^v?[\d.]{1,12}$/.test(String(tag))) return; // tag vem da rede: so digitos e pontos
-      const limpa = String(tag).replace(/^v/, '');
-      if (!vMaior(limpa, vAtual) || document.getElementById('appVerNew')) return;
-      const a2 = document.createElement('span');
-      a2.id = 'appVerNew'; a2.textContent = ' \u2192 v' + limpa;
-      a2.style.cssText = 'color:#f2c665;cursor:pointer';
-      a2.title = t('verNova');
-      a2.onclick = () => window.open('https://github.com/leodantas70/idle');
-      elVer.appendChild(a2);
+    const updateBtn = document.getElementById('appUpdate');
+    const verificaAtualizacao = async () => {
+      if (!updateBtn || !window.pokeAPI || typeof window.pokeAPI.checkForReleaseUpdate !== 'function') return;
+      try {
+        const r = await window.pokeAPI.checkForReleaseUpdate();
+        if (!r || !r.ok || !r.updateAvailable) return;
+        updateBtn.textContent = '⬆ Atualizar para ' + String(r.version || '').replace(/^v/i, 'v');
+        updateBtn.title = r.name ? 'Nova versão: ' + r.name : 'Atualizar o PokeGrid';
+        updateBtn.style.display = 'inline-flex';
+        updateBtn.onclick = async () => {
+          if (!window.confirm('Baixar e instalar a versão ' + r.version + '? O PokeGrid será fechado e reaberto.')) return;
+          updateBtn.disabled = true;
+          updateBtn.textContent = 'Baixando…';
+          const done = await window.pokeAPI.installReleaseUpdate();
+          if (!done || !done.ok) {
+            updateBtn.disabled = false;
+            updateBtn.textContent = '⬆ Atualizar para ' + String(r.version || '').replace(/^v/i, 'v');
+            updateBtn.title = (done && done.message) || 'Não foi possível atualizar agora.';
+            window.alert(updateBtn.title);
+          }
+        };
+      } catch (e) { try { window.pokeAPI.logError('atualizador-release-ui', e && e.message || e); } catch {} }
     };
-    const cacheV = lsObj('verNova');
-    if (cacheV.tag) vMostra(cacheV.tag);
-    if (vAtual && Date.now() - (+cacheV.t || 0) > 22 * 3600e3) setTimeout(() => {
-      fetch('https://api.github.com/repos/leodantas70/idle/releases/latest').then(r => r.json()).then(j => {
-        const tag = j && typeof j.tag_name === 'string' ? j.tag_name : '';
-        lsSet('verNova', JSON.stringify({ t: Date.now(), tag: /^v?[\d.]{1,12}$/.test(tag) ? tag : '' }));
-        vMostra(tag);
-      }).catch(() => {});
-    }, 8000); // depois do boot, sem atrasar nada
+    setTimeout(verificaAtualizacao, 3000);
   } catch {}
   // Layout dos paineis: grade (2x2) -> coluna (vertical) -> linha (horizontal)
   let layoutMode = lsGet('layout') || 'grid';
@@ -2239,7 +2409,8 @@ return {live,hasBalls,hasInv,balls,potions,revives,prevHunt:resumo(P.prev),shiny
     const bm = ws.balls;
     if (bm && bm.counts) {
       const byId = {}; (bm.catalog||[]).forEach(b => byId[b.id]=b);
-      const items = Object.keys(bm.counts).map(id => ({ id:'b'+id, name:(byId[id]||{}).name||('#'+id), qty:bm.counts[id] })).filter(x=>x.qty>0).sort((x,y)=>y.qty-x.qty);
+      const expires = bm.expires || {}, now = Date.now();
+      const items = Object.keys(bm.counts).map(id => { const b = byId[id] || {}, exp = expires[id] ? Date.parse(expires[id]) : 0, expired = exp && exp <= now, infinite = !!b.infinite; return { id:'b'+id, name:(b.name||('#'+id)) + (infinite ? ' ∞' : ''), qty:expired ? 0 : (infinite ? 999999 : bm.counts[id]), infinite }; }).filter(x=>x.qty>0).sort((x,y)=>y.qty-x.qty);
       if (items.length) bag.push({ label:'Pokébolas', total: items.reduce((s,x)=>s+x.qty,0), items });
     }
     const inv = (ws.inventory && ws.inventory.items) || [];
@@ -2253,14 +2424,14 @@ return {live,hasBalls,hasInv,balls,potions,revives,prevHunt:resumo(P.prev),shiny
     });
     const groups = {};
     inv.forEach(it => { const m = cat[it.itemId] || {}; const c = m.category || 'outros'; (groups[c] = groups[c] || []).push({ id: 'i'+it.itemId, name: m.name || ('#'+it.itemId), qty: it.quantity }); });
-    const LABELS = { potion:'Heal', heal:'Heal', revive:'Revive', loot:'Loot', stone:'Stones', tm:'TMs', card:'Cartas', clan:'Clã', key:'Chaves', outros:'Outros' };
-    const ORDER = ['potion','heal','revive','loot','stone','tm','card','clan','key','outros'];
+    const LABELS = { potion:'Heal', heal:'Heal', revive:'Revive', loot:'Loot', stone:'Stones', tm:'TMs', card:'Cartas', clan:'Clã', berry:'Berries', held:'Held', addon:'Addons', key:'Chaves', misc:'Outros', outros:'Outros' };
+    const ORDER = ['potion','heal','revive','loot','stone','tm','card','clan','berry','held','addon','key','outros'];
     const done = {};
     const pushGrp = c => { const items = groups[c].sort((x,y)=>y.qty-x.qty); bag.push({ label: LABELS[c]||'Outros', total: items.reduce((s,x)=>s+x.qty,0), items }); done[c]=1; };
     ORDER.forEach(c => { if (groups[c]) pushGrp(c); });
     Object.keys(groups).forEach(c => { if (!done[c]) pushGrp(c); });
     const pokeList = ((ws.pokes && ws.pokes.list)||[]);
-    const team = pokeList.filter(p=>p.team).sort((x,y)=>(x.slot||0)-(y.slot||0)).map(p=>({name:p.name,level:p.level,shiny:!!p.shiny,t1:p.type1||'',t2:p.type2||'',ld:!!p.leader,q:nL(p.quality),ivt:p.ivTotal!=null?nL(p.ivTotal):null,dt:!!p.isDitto,sid:+p.speciesId||+p.pokeId||0,hp:+p.hp||0,hm:+p.maxHp||+p.hpMax||+p.totalHp||0,xpp:(p.expPercent!=null?+p.expPercent:(p.expPct!=null?+p.expPct:(p.exp!=null&&+p.expToNext>0?Math.round(+p.exp/+p.expToNext*100):(+p.xp>0&&+p.level>0?(X=>{const a=X(+p.level),b=X(+p.level+1);return b>a?Math.round((+p.xp-a)/(b-a)*100):null})(n=>n<=1?0:Math.round(50/3*(n**3-6*n**2+17*n-12))):null))))}));
+    const team = pokeList.filter(p=>p.team).sort((x,y)=>(x.slot||0)-(y.slot||0)).map(p=>({name:p.name,level:p.level,shiny:!!p.shiny,t1:p.type1||'',t2:p.type2||'',ld:!!p.leader,q:nL(p.quality),ivt:p.ivTotal!=null?nL(p.ivTotal):null,dt:!!p.isDitto,tms:(Array.isArray(p.tms)?p.tms:[]).slice(0,24).map(x=>String(x).toUpperCase().slice(0,12)),sid:+p.speciesId||+p.pokeId||0,hp:+p.hp||0,hm:+p.maxHp||+p.hpMax||+p.totalHp||0,xpp:(p.expPercent!=null?+p.expPercent:(p.expPct!=null?+p.expPct:(p.exp!=null&&+p.expToNext>0?Math.round(+p.exp/+p.expToNext*100):(+p.xp>0&&+p.level>0?(X=>{const a=X(+p.level),b=X(+p.level+1);return b>a?Math.round((+p.xp-a)/(b-a)*100):null})(n=>n<=1?0:Math.round(50/3*(n**3-6*n**2+17*n-12))):null))))}));
     const activeHud = document.querySelector('.phud-mon.active');
     const hudName = String(((activeHud&&activeHud.querySelector('.phud-name'))||{}).textContent||'').trim();
     const activeRaw = (hudName&&pokeList.find(p=>p&&p.team&&String(p.name||'').toLowerCase()===hudName.toLowerCase())) || pokeList.find(p=>p&&p.team&&(p.leader||p.active||p.isActive)) || pokeList.filter(p=>p&&p.team).sort((x,y)=>(x.slot||0)-(y.slot||0))[0] || null;
@@ -2275,8 +2446,8 @@ return {live,hasBalls,hasInv,balls,potions,revives,prevHunt:resumo(P.prev),shiny
     const activePoke = activeName ? { id:String((activeRaw&&activeRaw.id)||activeName), name:activeName, level:+((hudLevelMatch&&hudLevelMatch[0])||(activeRaw&&activeRaw.level)||0), expPct:Number.isFinite(expPct)?Math.max(0,Math.min(100,expPct)):null } : null;
     const bagPokes = pokeList.map(p => {
       const st = p.stats || {};
-      return { id:String(p.id||''), name:String(p.name||'?'), level:+p.level||0, quality:nL(p.quality), ivTotal:nL(p.ivTotal),
-        shiny:!!p.shiny, team:!!p.team, locked:!!p.locked,
+      return { id:String(p.id||''), sid:+p.speciesId||+p.pokeId||0, name:String(p.name||'?'), level:+p.level||0, quality:nL(p.quality), ivTotal:nL(p.ivTotal),
+        shiny:!!p.shiny, team:!!p.team, locked:!!(p.locked ?? p.isLocked ?? p.protected ?? p.sellLocked), type1:String(p.type1||''), type2:String(p.type2||''),
         stats:{ hp:Math.floor(+(st.hp!=null?st.hp:p.hp)||0), atk:Math.floor(+(st.atk!=null?st.atk:p.atk)||0), def:Math.floor(+(st.def!=null?st.def:p.def)||0),
           spa:Math.floor(+(st.spAtk!=null?st.spAtk:(st.spa!=null?st.spa:(p.spAtk!=null?p.spAtk:p.spa)))||0),
           spd:Math.floor(+(st.spDef!=null?st.spDef:(st.spd!=null?st.spd:(p.spDef!=null?p.spDef:p.spd)))||0),
@@ -2287,12 +2458,12 @@ return {live,hasBalls,hasInv,balls,potions,revives,prevHunt:resumo(P.prev),shiny
     hunt = hunt.replace(/[_-]+/g,' ').replace(/\\b\\w/g, m=>m.toUpperCase());
     const mail = ws['mail-badge'] || {};
     let sBalls = 0, sPot = 0, sRev = 0;
-    bag.forEach(g => { if (g.label === 'Pokébolas') sBalls = g.total; else if (g.label === 'Heal') sPot = g.total; else if (g.label === 'Revive') sRev = g.total; });
+    bag.forEach(g => { if (g.label === 'Pokébolas') sBalls = g.items.some(x => x.infinite) ? 999999 : g.total; else if (g.label === 'Heal') sPot = g.total; else if (g.label === 'Revive') sRev = g.total; });
     const invMap = {}; inv.forEach(it => invMap[it.itemId] = it.quantity);
-    const ballMap = {}; if (bm && bm.counts) for (const bk in bm.counts) ballMap[bk] = bm.counts[bk];
-    const ballList = (bm && bm.catalog ? bm.catalog : []).map(b => ({ id:String(b.id), name:b.name||('#'+b.id), qty:+ballMap[b.id]||0, price:+b.priceGold||+b.price||0 }));
+    const ballMap = {}; if (bm && bm.counts) { const ex = bm.expires || {}, nowB = Date.now(), byIdB = {}; (bm.catalog || []).forEach(b => byIdB[b.id] = b); for (const bk in bm.counts) { const exp = ex[bk] ? Date.parse(ex[bk]) : 0; ballMap[bk] = exp && exp <= nowB ? 0 : (byIdB[bk] && byIdB[bk].infinite ? 999999 : bm.counts[bk]); } }
+    const ballList = (bm && bm.catalog ? bm.catalog : []).map(b => ({ id:String(b.id), name:(b.name||('#'+b.id)) + (b.infinite ? ' ∞' : ''), qty:+ballMap[b.id]||0, infinite:!!b.infinite, price:+b.priceGold||+b.price||0 }));
     const supplyNames = new Set(['hyper potion','ultimate potion','revive','max revive']);
-    const supplyList = (doc && doc.items ? doc.items : []).filter(it => supplyNames.has(String(it.name||'').toLowerCase())).map(it => ({ id:String(it.id), name:it.name, qty:+invMap[it.id]||0, price:+it.npcPrice||+it.priceGold||+it.price||0 }));
+    const supplyList = (doc && doc.items ? doc.items : []).filter(it => supplyNames.has(String(it.name||'').toLowerCase())).map(it => ({ id:String(it.id), name:it.name, qty:+invMap[it.id]||0, price:+it.priceGold||+it.npcPrice||+it.price||0 }));
     const stoneList = (doc && doc.items ? doc.items : []).filter(it => String(it.category||'').toLowerCase()==='stone' && (+invMap[it.id]||0)>0).map(it => ({ id:String(it.id), name:String(it.name||('#'+it.id)), qty:+invMap[it.id]||0 }));
     return { ok:true, cid: ch.id||'', name: ch.name||'', level: ch.level||0, gold: ch.gold||0, diamonds: ch.diamonds||0, vip: !!ch.isVip, clan: ch.clan||null, clanRank: ch.clanRank||0, shinyEnc: P.shinyEnc||0, usedList: P.usedList||[], catchLog: P.catchLog||[], shinyLog: P.shinyLog||[], chatShares: P.chatShares||[], travelTemplate:P.travelTemplate||null, balls: sBalls, potions: sPot, revives: sRev, ballPrice, invMap, ballMap, ballList,
       supplyList, stoneList, trackedItems, prof: ch.profession||'', profRank: ch.professionRank||0, catches: ch.catches||0, hunt, huntSlug, gifts: mail.gifts||0,
@@ -2352,17 +2523,17 @@ return {live,hasBalls,hasInv,balls,potions,revives,prevHunt:resumo(P.prev),shiny
     }
   }
 
-  const BAGCOR = { 'Pokébolas':'#e3350d', 'Heal':'#f778ba', 'Revive':'#58a6ff', 'Loot':'#e0b458', 'Stones':'#bc8cff', 'TMs':'#7ee0a0', 'Cartas':'#ff7bce', 'Clã':'#79c0ff', 'Chaves':'#f2c665', 'Outros':'#7d8590' };
+  const BAGCOR = { 'Pokébolas':'#e3350d', 'Heal':'#f778ba', 'Revive':'#58a6ff', 'Loot':'#e0b458', 'Stones':'#bc8cff', 'TMs':'#7ee0a0', 'Cartas':'#ff7bce', 'Clã':'#79c0ff', 'Berries':'#a3e635', 'Held':'#f97316', 'Addons':'#22d3ee', 'Chaves':'#f2c665', 'Outros':'#7d8590' };
   // ----- Config modular do painel (ordem, visibilidade, itens fixados) -----
   const SECTIONS = ['kpis', 'session', 'gold', 'compare', 'drops', 'bag', 'pinned', 'target', 'team'];
-  const BAGCATS = ['Pokébolas', 'Heal', 'Revive', 'Loot', 'Stones', 'TMs', 'Cartas', 'Clã', 'Chaves', 'Outros'];
+  const BAGCATS = ['Pokébolas', 'Heal', 'Revive', 'Loot', 'Stones', 'TMs', 'Cartas', 'Clã', 'Berries', 'Held', 'Addons', 'Chaves', 'Outros'];
   const secLabel = (k) => ({ kpis: t('stKpis'), session: t('stSession'), gold: t('stGold'), compare: t('stCompare'), drops: t('stDrops'), bag: 'Bag', pinned: t('stPinned'), target: t('stTargetLabel'), team: t('stTeam') }[k] || k);
   function loadStatsCfg() {
     let c = {}; try { c = lsObj('statsCfg'); } catch {}
     c.order = Array.isArray(c.order) ? c.order.filter(x => SECTIONS.includes(x)) : [];
     SECTIONS.forEach(s => { if (!c.order.includes(s)) c.order.push(s); });
     c.bagOrder = Array.isArray(c.bagOrder) ? c.bagOrder.filter(x => BAGCATS.includes(x)) : [];
-    BAGCATS.forEach(s => { if (!c.bagOrder.includes(s)) c.bagOrder.push(s); });
+    BAGCATS.forEach(s => { if (c.bagOrder.includes(s)) return; const io = c.bagOrder.indexOf('Outros'); if (io >= 0 && s !== 'Outros') c.bagOrder.splice(io, 0, s); else c.bagOrder.push(s); });
     c.hide = c.hide || {};
     c.bagHide = c.bagHide || {};
     c.itemHide = c.itemHide || {};
@@ -2525,10 +2696,10 @@ return {live,hasBalls,hasInv,balls,potions,revives,prevHunt:resumo(P.prev),shiny
     const favoriteOptions = '<option value="">' + favoritePlaceholder + '</option>' + favoriteList.map(x => '<option value="' + esc(x.slug) + '"' + (favoriteCurrent === x ? ' selected' : '') + '>' + esc(x.name || x.slug) + (+x.level ? ' · Lv ' + nf(x.level) : '') + (String(x.ar || '').toLowerCase() === 'orre' ? ' · ORRE' : '') + '</option>').join('');
     h += '<div style="padding:12px 14px 8px;border-top:1px solid #30363d;margin-top:12px">'
       + '<div style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:7px">'
-      + '<button id="stOpenMarket" style="padding:8px 5px;border:1px solid #30363d;border-radius:7px;background:#161b22;color:#e6edf3;cursor:pointer">🏪 Abrir Market</button>'
-      + '<button id="stOpenDepot" style="padding:8px 5px;border:1px solid #30363d;border-radius:7px;background:#161b22;color:#e6edf3;cursor:pointer">📦 Abrir Baú</button>'
-      + '<button id="stSellPokes" style="padding:8px 5px;border:1px solid #7d3b42;border-radius:7px;background:#2a171a;color:#ffb3ba;cursor:pointer">Vender Pokémon</button>'
-      + '<button id="stSellItems" style="padding:8px 5px;border:1px solid #7d3b42;border-radius:7px;background:#2a171a;color:#ffb3ba;cursor:pointer">Vender itens</button>'
+      + '<button id="stOpenMarket" class="cd-open-market">🏪 Abrir Market</button>'
+      + '<button id="stOpenDepot" class="cd-open-depot">📦 Abrir Baú</button>'
+      + '<button id="stSellPokes" class="cd-sell-pokes">Vender Pokémon</button>'
+      + '<button id="stSellItems" class="cd-sell-safe">Vender itens</button>'
       + '</div></div>'
       + '<div style="padding:0 14px 16px">'
       + '<button id="stBackLastHunt" style="width:100%;padding:9px;border:1px solid #388bfd;border-radius:7px;background:#13233a;color:#79c0ff;font-weight:700;cursor:pointer"'
@@ -2539,14 +2710,10 @@ return {live,hasBalls,hasInv,balls,potions,revives,prevHunt:resumo(P.prev),shiny
       + '</div></div></div>';
     if (campoDigitacaoAtivo(stBody)) return;
     stBody.innerHTML = h;
-    const market = stBody.querySelector('#stOpenMarket'); if (market) market.onclick = () => openCharacterMarket(statsIdx);
-    const depot = stBody.querySelector('#stOpenDepot'); if (depot) depot.onclick = () => openCharacterDepot(statsIdx);
-    const sellPokes = stBody.querySelector('#stSellPokes'); if (sellPokes) sellPokes.onclick = () => {
-      sellPokes.disabled = true; sellPokes.textContent = 'Vendendo…'; sellSafePokes(statsIdx);
-    };
-    const sellItems = stBody.querySelector('#stSellItems'); if (sellItems) sellItems.onclick = () => {
-      sellItems.disabled = true; sellItems.textContent = 'Vendendo…'; sellSafeItems(statsIdx);
-    };
+    const market = stBody.querySelector('#stOpenMarket'); if (market) bindBusyButton(market, 'Abrindo…', '🏪 Abrir Market', () => openCharacterMarket(statsIdx));
+    const depot = stBody.querySelector('#stOpenDepot'); if (depot) bindBusyButton(depot, 'Abrindo…', '📦 Abrir Baú', () => openCharacterDepot(statsIdx));
+    const sellPokes = stBody.querySelector('#stSellPokes'); if (sellPokes) bindBusyButton(sellPokes, 'Vendendo…', 'Vender Pokémon', () => sellSafePokes(statsIdx));
+    const sellItems = stBody.querySelector('#stSellItems'); if (sellItems) bindBusyButton(sellItems, 'Vendendo…', 'Vender itens', () => sellSafeItems(statsIdx));
     const back = stBody.querySelector('#stBackLastHunt');
     if (back && lastHunt) back.onclick = () => {
       back.disabled = true; back.textContent = 'Enviando…';
@@ -2750,7 +2917,7 @@ return {live,hasBalls,hasInv,balls,potions,revives,prevHunt:resumo(P.prev),shiny
     return !!(ae && root && root.contains(ae) && (ae.isContentEditable ||
       (/^(INPUT|TEXTAREA)$/.test(ae.tagName) && !/^(checkbox|radio|button|submit|reset|file|range|color|date|time|month|week)$/.test(ae.type || 'text'))));
   };
-  async function refreshStats() {
+  async function renderStatsRefresh() {
     if (!statsOpen || dragging) return;
     if (campoDigitacaoAtivo(stBody)) return;
     if (stTabs.childElementCount !== count + 1) buildStatsTabs();
@@ -2764,6 +2931,12 @@ return {live,hasBalls,hasInv,balls,potions,revives,prevHunt:resumo(P.prev),shiny
       renderStats(d);
       if (d && d.ok && d.name && tabNames[statsIdx] !== d.name) { tabNames[statsIdx] = d.name; buildStatsTabs(); }
     } catch { if (!campoDigitacaoAtivo(stBody)) stBody.innerHTML = '<div class="st-empty">' + t('statsWaiting') + '</div>'; }
+  }
+  let statsRefreshPromise = null;
+  async function refreshStats() {
+    if (statsRefreshPromise) return statsRefreshPromise;
+    statsRefreshPromise = renderStatsRefresh();
+    try { return await statsRefreshPromise; } finally { statsRefreshPromise = null; }
   }
   async function trocaLider(row) {
     if (row.dataset.ld === '1') return; // ja e o lider
@@ -2808,8 +2981,8 @@ return {live,hasBalls,hasInv,balls,potions,revives,prevHunt:resumo(P.prev),shiny
       buildStatsTabs(); loadTabNames(); refreshStats();
     }
   }
-  statsBtn.onclick = () => { statsOpen = !statsOpen; statsAutoPend = false; applyStats(); };
-  statsEl.querySelector('.st-x').onclick = () => { statsOpen = false; statsAutoPend = false; applyStats(); };
+  statsBtn.onclick = () => { statsOpen = !statsOpen; statsAutoPend = false; applyStats(); if (!statsOpen) focarJogo(); };
+  statsEl.querySelector('.st-x').onclick = () => { statsOpen = false; statsAutoPend = false; applyStats(); focarJogo(); };
   // largura ajustável: arrasta a borda direita (os elementos se reencaixam sozinhos)
   (() => {
     const handle = statsEl.querySelector('.st-resize');
@@ -3002,7 +3175,116 @@ return {live,hasBalls,hasInv,balls,potions,revives,prevHunt:resumo(P.prev),shiny
 
   // ===== Modo Cartas: dashboard ultra leve (jogo invisivel a ~1fps, farm continua no servidor) =====
   const cardsEl = document.getElementById('cards');
+  const simpleChatTabs = new Map();
+  let simpleChatActive = '';
+  const OPEN_SIMPLE_CHAT = player => `(()=>{try{const n=${JSON.stringify(String(player||'').slice(0,60))},norm=v=>String(v||'').trim().toLowerCase();const els=[...document.querySelectorAll('.chat-box [data-user],.chat-box [data-username],.chat-box [data-player],.chat-box [data-name],.chat-box button,.chat-box a,.chat-box [role="button"],.chat-box [role="listitem"],.chat-box .chat-message,.chat-box .message')];const el=els.find(x=>norm(x.dataset.user||x.dataset.username||x.dataset.player||x.dataset.name)===norm(n))||els.find(x=>norm(x.textContent)===norm(n));if(el){el.click();return{ok:true};}return{ok:false,reason:'Jogador não encontrado no chat nativo'};}catch(e){return{ok:false,reason:e.message||'Não foi possível abrir o chat'}}})()`;
+  const SEND_SIMPLE_CHAT = text => `(()=>{try{const msg=${JSON.stringify(String(text||'').slice(0,500))};if(!msg)return{ok:false,reason:'Mensagem vazia'};const inputs=[...document.querySelectorAll('input,textarea')],input=inputs.find(x=>/Message to|Mensagem para|private|privad|Talk to|Falar com/i.test((x.placeholder||'')+' '+(x.getAttribute('aria-label')||'')))||inputs.find(x=>x.closest('.chat-box')&&/Talk in|Falar em/i.test(x.placeholder||''));if(!input)return{ok:false,reason:'Campo do chat privado não encontrado'};const proto=input instanceof HTMLTextAreaElement?HTMLTextAreaElement.prototype:HTMLInputElement.prototype,setter=Object.getOwnPropertyDescriptor(proto,'value')&&Object.getOwnPropertyDescriptor(proto,'value').set;if(setter)setter.call(input,msg);else input.value=msg;input.dispatchEvent(new InputEvent('input',{bubbles:true,inputType:'insertText',data:msg}));input.dispatchEvent(new Event('change',{bubbles:true}));input.focus();const root=input.closest('form')||input.closest('[role="dialog"]')||input.closest('.chat-box')||input.parentElement,send=root&&[...root.querySelectorAll('button')].find(b=>b.type==='submit'||/send|enviar/i.test((b.textContent||'')+' '+(b.getAttribute('aria-label')||'')));if(send){send.click();return{ok:true,method:'button'};}input.dispatchEvent(new KeyboardEvent('keydown',{key:'Enter',code:'Enter',which:13,keyCode:13,bubbles:true,cancelable:true}));input.dispatchEvent(new KeyboardEvent('keyup',{key:'Enter',code:'Enter',which:13,keyCode:13,bubbles:true,cancelable:true}));return{ok:true,method:'enter'};}catch(e){return{ok:false,reason:e.message||'Não foi possível enviar a mensagem'}}})()`;
+  function ensureSimpleChatDock() {
+    let dock = document.getElementById('simpleChatDock');
+    if (dock) return dock;
+    dock = document.createElement('div'); dock.id = 'simpleChatDock';
+    dock.innerHTML = '<div class="sc-tabs"></div><div class="sc-title"></div><div class="sc-messages"></div><div class="sc-compose"><select class="sc-account" title="Conta que enviará a mensagem"></select><input type="text" maxlength="500" placeholder="Mensagem…"><button type="button">Enviar</button></div>';
+    document.body.appendChild(dock);
+    return dock;
+  }
+  function renderSimpleChatDock() {
+    const dock = ensureSimpleChatDock(), tabs = dock.querySelector('.sc-tabs'), title = dock.querySelector('.sc-title'), messages = dock.querySelector('.sc-messages');
+    dock.classList.toggle('has-chat', simpleChatTabs.size > 0);
+    tabs.innerHTML = '';
+    for (const [key, tab] of simpleChatTabs) {
+      const b = document.createElement('button'); b.className = 'sc-tab' + (key === simpleChatActive ? ' active' : ''); b.type = 'button'; b.textContent = tab.player;
+      const x = document.createElement('span'); x.className = 'sc-close'; x.textContent = '×'; x.title = 'Fechar chat';
+      x.onclick = e => { e.stopPropagation(); simpleChatTabs.delete(key); if (simpleChatActive === key) simpleChatActive = [...simpleChatTabs.keys()][0] || ''; renderSimpleChatDock(); };
+      b.appendChild(x); b.onclick = () => { simpleChatActive = key; renderSimpleChatDock(); }; tabs.appendChild(b);
+    }
+    const tab = simpleChatTabs.get(simpleChatActive);
+    title.textContent = tab ? 'Chat com ' + tab.player : 'Nenhum chat aberto';
+    messages.innerHTML = '';
+    if (tab) {
+      if (!tab.messages.length) messages.innerHTML = '<div class="sc-empty">Nenhuma mensagem recebida ainda.</div>';
+      else tab.messages.forEach(m => { const el = document.createElement('div'); el.className = 'sc-msg' + (m.mine ? ' mine' : ''); el.textContent = m.body; messages.appendChild(el); });
+    }
+    messages.scrollTop = messages.scrollHeight;
+    const account = dock.querySelector('.sc-account'), input = dock.querySelector('.sc-compose input'), send = dock.querySelector('.sc-compose button');
+    send.disabled = !tab;
+    account.innerHTML = tab ? tab.accounts.map((a, idx) => '<option value="' + a.i + '">' + esc(a.name) + '</option>').join('') : '';
+    if (tab) account.value = String(tab.accountId);
+    account.disabled = !tab || tab.accounts.length < 2;
+    account.onchange = async () => { if (tab) { tab.accountId = +account.value; const w = webviews[tab.accountId]; if (w) { try { await w.executeJavaScript('(' + chatScript(false) + ')'); await w.executeJavaScript(OPEN_SIMPLE_CHAT(tab.player)); } catch {} } } };
+    const submit = async () => {
+      const active = simpleChatTabs.get(simpleChatActive), textMsg = input.value.trim();
+      if (!active || !textMsg || !webviews[active.accountId]) return;
+      const w = webviews[active.accountId];
+      const opened = await w.executeJavaScript('(' + chatScript(false) + ')').catch(e => ({ ok:false, reason:e.message || 'falha ao exibir o chat' }));
+      const selected = await w.executeJavaScript(OPEN_SIMPLE_CHAT(active.player)).catch(e => ({ ok:false, reason:e.message || 'falha ao abrir o chat privado' }));
+      const sent = selected && selected.ok ? await w.executeJavaScript(SEND_SIMPLE_CHAT(textMsg)).catch(e => ({ ok:false, reason:e.message || 'falha ao enviar' })) : selected;
+      if (!sent || !sent.ok) {
+        active.messages.push({ body:'Não enviado: ' + ((sent && sent.reason) || (opened && opened.reason) || 'chat privado indisponível'), mine:false, error:true, t:Date.now() });
+        renderSimpleChatDock(); return;
+      }
+      active.messages.push({ body:textMsg, mine:true, t:Date.now() }); input.value = ''; renderSimpleChatDock();
+    };
+    send.onclick = submit; input.onkeydown = e => { if (e.key === 'Enter') { e.preventDefault(); submit(); } };
+  }
+  function ensureSimpleChatTab(player, accountId, messages) {
+    const name = String(player || '').trim(); if (!name || accountId == null || !webviews[+accountId]) return '';
+    const key = String(accountId) + ':' + name.toLowerCase();
+    if (!simpleChatTabs.has(key)) {
+      const accountsForChat = webviews.map((w, i) => ({ i, name:tabNames[i] || stName(i) })).filter(a => !off[a.i] && webviews[a.i]);
+      simpleChatTabs.set(key, { player:name, accountId:+accountId, accounts:accountsForChat, messages:messages || [] });
+    } else if (messages && messages.length) {
+      const tab = simpleChatTabs.get(key); tab.messages = messages;
+    }
+    return key;
+  }
+  async function openSimpleChat(player, accountId) {
+    const name = String(player || '').trim(); if (!name || accountId == null) return;
+    const key = ensureSimpleChatTab(name, accountId); if (!key) return;
+    simpleChatActive = key; renderSimpleChatDock();
+    const w = webviews[+accountId];
+    if (w) { try { await w.executeJavaScript('(' + chatScript(false) + ')'); await w.executeJavaScript(OPEN_SIMPLE_CHAT(name)); } catch {} }
+    refreshSimpleChats();
+  }
+  async function refreshSimpleChats() {
+    let opened = false;
+    for (let i = 0; i < webviews.length; i++) {
+      if (off[i] || !webviews[i]) continue;
+      const list = await webviews[i].executeJavaScript(READ_DIRECT_CHAT).catch(() => []) || [];
+      const own = String(tabNames[i] || stName(i) || '').toLowerCase();
+      const incoming = list.filter(m => {
+        const from = String(m.from || '').trim(), to = String(m.to || '').trim();
+        return from && from.toLowerCase() !== own && (!to || to.toLowerCase() === own);
+      });
+      if (incoming.length) {
+        const player = String(incoming[incoming.length - 1].from || '').trim();
+        const key = ensureSimpleChatTab(player, i, incoming.map(m => ({ body:String(m.body || ''), mine:false, t:m.t })));
+        if (key && key !== simpleChatActive) { simpleChatActive = key; opened = true; }
+      }
+    }
+    for (const tab of simpleChatTabs.values()) {
+      const list = await webviews[tab.accountId]?.executeJavaScript(READ_DIRECT_CHAT).catch(() => []) || [];
+      const incoming = list.filter(m => String(m.from || '').toLowerCase() === tab.player.toLowerCase() || String(m.to || '').toLowerCase() === tab.player.toLowerCase()).map(m => ({ body:String(m.body || ''), mine:String(m.from || '').toLowerCase() !== tab.player.toLowerCase(), t:m.t }));
+      const local = tab.messages.filter(m => m.mine);
+      tab.messages = [...incoming, ...local].sort((a,b) => (+a.t||0) - (+b.t||0)).slice(-80);
+    }
+    if (simpleChatTabs.size || opened) renderSimpleChatDock();
+  }
+  setInterval(() => { if (cardsOn && perfOn('chat') && simpleChatTabs.size) refreshSimpleChats(); }, 2000);
   const cardsBtn = document.getElementById('cardsBtn');
+  // Depois de uma acao que nao edita um filtro, devolve o teclado ao jogo. Campos de
+  // texto/select continuam com foco para permitir edicao normal.
+  cardsEl.addEventListener('click', (e) => {
+    if (!cardsOn || e.target.closest('input,textarea,select,[contenteditable="true"]')) return;
+    setTimeout(() => { if (cardsOn && !campoDigitacaoAtivo(cardsEl)) focarJogo(); }, 0);
+  });
+  const appTemCampoAtivo = () => {
+    const ae = document.activeElement;
+    return !!(ae && (ae.isContentEditable || /^(INPUT|TEXTAREA|SELECT)$/.test(ae.tagName)));
+  };
+  window.addEventListener('focus', () => {
+    if (cardsOn || statsOpen || appTemCampoAtivo()) return;
+    setTimeout(() => { if (!cardsOn && !statsOpen && !appTemCampoAtivo()) focarJogo(); }, 30);
+  });
   let dhist = [];                      // amostras {t,g,x} da ultima hora pros sparklines
   let dsort = { k: 'gph', d: -1 };     // ordenacao da tabela
   // raridade pela qualidade: mesmos limites e cores da funcao qualityInfo do jogo
@@ -3160,8 +3442,8 @@ return {live,hasBalls,hasInv,balls,potions,revives,prevHunt:resumo(P.prev),shiny
   let huntScope = lsGet('huntScope') || 'minhas'; // 'minhas' (as que voce farma/favoritou) | 'todas'
   let showHiddenHunts = false; // transitorio: revelar as ocultas pra desfazer
   // ----- Cartas modular: cada seção liga/desliga e reordena, salvo no localStorage -----
-  const CDSECTS = ['kpis', 'today', 'table', 'balls', 'bagIv', 'sellItems', 'recentHunts', 'hunts', 'catches', 'shinies', 'shinyTried', 'trend', 'shared', 'team', 'inv', 'pokedexTp'];
-  const cdLabel = (k) => ({ kpis: t('cdSecKpis'), today: t('cdToday'), table: t('cdByAcc2'), balls: 'Pokébolas e curas por personagem', bagIv: 'Análise de IV da bag', sellItems: 'Venda protegida de itens', recentHunts: 'Últimas hunts por personagem', pokedexTp: 'Pokédex e teleporte', hunts: t('cdHunts'), catches: t('cdCatches'), shinies: t('cdShinies'), shinyTried: t('cdShinyTried'), trend: t('cdTrend'), shared: t('cdShared'), team: t('cdTeams'), inv: t('cdInv') }[k] || k);
+  const CDSECTS = ['kpis', 'today', 'table', 'balls', 'recentHunts', 'hunts', 'catches', 'shinies', 'shinyTried', 'trend', 'shared', 'team', 'inv', 'pokedexTp'];
+  const cdLabel = (k) => ({ kpis: t('cdSecKpis'), today: t('cdToday'), table: t('cdByAcc2'), balls: 'Pokébolas e curas por personagem', recentHunts: 'Últimas hunts por personagem', pokedexTp: 'Pokédex e teleporte', hunts: t('cdHunts'), catches: t('cdCatches'), shinies: t('cdShinies'), shinyTried: t('cdShinyTried'), trend: t('cdTrend'), shared: t('cdShared'), team: t('cdTeams'), inv: t('cdInv') }[k] || k);
   // Melhor catch: por que criterio. Padrao IV x qualidade, porque a qualidade multiplica os
   // stats e o poder final, entao IV puro sozinho engana (126/192 x1.80 bate 150/192 x0.95).
   let bestCrit = ['ivq', 'iv', 'q'].includes(lsGet('bestCrit')) ? lsGet('bestCrit') : 'ivq';
@@ -3171,6 +3453,7 @@ return {live,hasBalls,hasInv,balls,potions,revives,prevHunt:resumo(P.prev),shiny
   let shinyTargets = {}; try { shinyTargets = lsObj('shinyTargets'); } catch {}
   const utBase = []; // baseline de tentativas por conta: o que veio antes da sessao nao conta no modo sessao
   let cardsCfg = { order: CDSECTS.slice(), hide: {}, w: {}, h: {} }, cardsCfgOpen = false, cdBusy = 0;
+  let depotPokeFilt = { acc: -1, name: '', iv: 0, q: 0, shiny: false };
   // larguras padrão (colunas de 12): linhas fecham certinho em tela cheia (12 | 12 | 4+4+4 | 6+3+3)
   // filtros das capturas: conta, nome, shiny, qualidade, IV e período.
   // Esse estado precisa existir antes de SB.catches e dos eventos do painel serem montados.
@@ -3186,7 +3469,7 @@ return {live,hasBalls,hasInv,balls,potions,revives,prevHunt:resumo(P.prev),shiny
       per: +c0.per || 0
     };
   } catch {}
-  const CDW_DEF = { kpis: 12, today: 12, table: 12, balls: 12, bagIv: 12, sellItems: 12, recentHunts: 12, hunts: 4, catches: 4, shinies: 4, shinyTried: 6, trend: 3, shared: 3, team: 12, inv: 6, pokedexTp: 12 };
+  const CDW_DEF = { kpis: 12, today: 12, table: 12, balls: 12, recentHunts: 12, hunts: 4, catches: 4, shinies: 4, shinyTried: 6, trend: 3, shared: 3, team: 12, inv: 6, pokedexTp: 12 };
   const cdW = (s) => Math.max(3, Math.min(12, +(cardsCfg.w[s]) || CDW_DEF[s] || 6));
   try { const c = lsObj('cardsCfg'); if (Array.isArray(c.order)) cardsCfg.order = c.order.filter(x => CDSECTS.includes(x)); CDSECTS.forEach(s => { if (!cardsCfg.order.includes(s)) cardsCfg.order.push(s); }); cardsCfg.hide = c.hide || {}; if (c.w && typeof c.w === 'object') cardsCfg.w = c.w; if (c.h && typeof c.h === 'object') cardsCfg.h = c.h; } catch {}
   const saveCardsCfg = () => { try { lsSet('cardsCfg', JSON.stringify(cardsCfg)); } catch {} };
@@ -3276,7 +3559,7 @@ return {live,hasBalls,hasInv,balls,potions,revives,prevHunt:resumo(P.prev),shiny
   const BUY_1000_BALL = (name) => `(async()=>{const name=${JSON.stringify(name)};const norm=s=>String(s||'').toLowerCase().normalize('NFD').replace(/[\\u0300-\\u036f]/g,'').replace(/\\s+/g,' ').trim();const set=(el,v)=>{const p=Object.getOwnPropertyDescriptor(HTMLInputElement.prototype,'value');p.set.call(el,String(v));el.dispatchEvent(new Event('input',{bubbles:true}));el.dispatchEvent(new Event('change',{bubbles:true}));};const qty=document.querySelector('.mk-window input.mk-qty');if(!qty)return {ok:false,reason:'shop'};set(qty,1000);const slider=document.querySelector('.mk-window input.mk-qtyslider');if(slider)set(slider,1000);await new Promise(r=>setTimeout(r,80));const row=[...document.querySelectorAll('.mk-window .mk-row')].find(r=>norm((r.querySelector('.mk-name')||{}).textContent)===norm(name));const buy=row&&row.querySelector('button.mk-buy');if(!buy)return {ok:false,reason:'item'};buy.click();return {ok:true};})()`;
   const BUY_1000_BALL_API = (id, name) => `(async()=>{const id=${JSON.stringify(id)},name=${JSON.stringify(name)};try{if(window.__pgAuth){const r=await fetch('/api/game/shop/buy',{method:'POST',headers:{Authorization:window.__pgAuth,'Content-Type':'application/json'},body:JSON.stringify({ballId:+id,qty:1000})});let j={};try{j=await r.json()}catch(x){}if(!r.ok)throw new Error(j.message||('HTTP '+r.status));try{if(window.__poke&&window.__poke.sock&&window.__poke.sock.readyState===1)window.__poke.sock.send(JSON.stringify({type:'inv-get'}))}catch(x){}return {ok:true,bought:j.bought||1000};}}catch(e){return {ok:false,reason:e.message||'api'};}const norm=s=>String(s||'').toLowerCase().normalize('NFD').replace(/[\\u0300-\\u036f]/g,'').replace(/\\s+/g,' ').trim();const set=(el,v)=>{const p=Object.getOwnPropertyDescriptor(HTMLInputElement.prototype,'value');p.set.call(el,String(v));el.dispatchEvent(new Event('input',{bubbles:true}));el.dispatchEvent(new Event('change',{bubbles:true}));};const qty=document.querySelector('.mk-window input.mk-qty');if(!qty)return {ok:false,reason:'auth'};set(qty,1000);const slider=document.querySelector('.mk-window input.mk-qtyslider');if(slider)set(slider,1000);await new Promise(r=>setTimeout(r,80));const row=[...document.querySelectorAll('.mk-window .mk-row')].find(r=>norm((r.querySelector('.mk-name')||{}).textContent)===norm(name));const buy=row&&row.querySelector('button.mk-buy');if(!buy)return {ok:false,reason:'item'};buy.click();return {ok:true,bought:1000};})()`;
   const BUY_1000_BALL_V2 = (id) => `(async()=>{const id=${JSON.stringify(id)},key='pokeweb:tokens';const read=()=>{try{return JSON.parse(sessionStorage.getItem(key)||localStorage.getItem(key)||'null')}catch(x){return null}};const save=t=>{sessionStorage.setItem(key,JSON.stringify(t));try{localStorage.removeItem(key)}catch(x){}};const post=token=>fetch('/api/game/shop/buy',{method:'POST',headers:{'Content-Type':'application/json',...(token?{Authorization:'Bearer '+token}:{})},body:JSON.stringify({ballId:+id,qty:1000})});try{let tokens=read();if(!tokens||!tokens.accessToken)return {ok:false,reason:'Sessão sem token'};let r=await post(tokens.accessToken);if(r.status===401&&tokens.refreshToken){const rr=await fetch('/api/auth/refresh',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({refreshToken:tokens.refreshToken})});if(rr.ok){tokens=await rr.json();save(tokens);r=await post(tokens.accessToken);}}const j=await r.json().catch(()=>({}));if(!r.ok)return {ok:false,reason:j.message||('HTTP '+r.status)};try{if(window.__poke&&window.__poke.sock&&window.__poke.sock.readyState===1)window.__poke.sock.send(JSON.stringify({type:'inv-get'}))}catch(x){}return {ok:true,bought:j.bought||1000};}catch(e){return {ok:false,reason:e.message||'Erro na compra'};}})()`;
-  const BUY_1000_SUPPLY = (kind, id) => `(async()=>{const kind=${JSON.stringify(kind)},id=${JSON.stringify(id)},key='pokeweb:tokens';const read=()=>{try{return JSON.parse(sessionStorage.getItem(key)||localStorage.getItem(key)||'null')}catch(x){return null}};const save=t=>{sessionStorage.setItem(key,JSON.stringify(t));try{localStorage.removeItem(key)}catch(x){}};const post=token=>fetch('/api/game/shop/buy',{method:'POST',headers:{'Content-Type':'application/json',Authorization:'Bearer '+token},body:JSON.stringify({[kind==='ball'?'ballId':'itemId']:+id,qty:1000})});try{let tokens=read();if(!tokens||!tokens.accessToken)return {ok:false,reason:'Sessão sem token'};let r=await post(tokens.accessToken);if(r.status===401&&tokens.refreshToken){const rr=await fetch('/api/auth/refresh',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({refreshToken:tokens.refreshToken})});if(rr.ok){tokens=await rr.json();save(tokens);r=await post(tokens.accessToken);}}const j=await r.json().catch(()=>({}));if(!r.ok)return {ok:false,reason:j.message||('HTTP '+r.status)};try{if(window.__poke&&window.__poke.sock&&window.__poke.sock.readyState===1)window.__poke.sock.send(JSON.stringify({type:'inv-get'}))}catch(x){}return {ok:true};}catch(e){return {ok:false,reason:e.message||'Erro na compra'};}})()`;
+  const BUY_1000_SUPPLY = (kind, id, unitPrice) => `(async()=>{const kind=${JSON.stringify(kind)},id=${JSON.stringify(id)},unitPrice=Math.max(0,+${JSON.stringify(unitPrice)}||0),key='pokeweb:tokens';const read=()=>{try{return JSON.parse(sessionStorage.getItem(key)||localStorage.getItem(key)||'null')}catch(x){return null}};const save=t=>{sessionStorage.setItem(key,JSON.stringify(t));try{localStorage.removeItem(key)}catch(x){}};const authHeaders=token=>({'Content-Type':'application/json',Authorization:'Bearer '+token});const readGold=async token=>{try{const rr=await fetch('/api/characters/me',{headers:{Authorization:'Bearer '+token}}),jj=await rr.json().catch(()=>({})),g=+(jj&&jj.character&&jj.character.gold);if(Number.isFinite(g))return g;}catch(x){}return null;};const post=(token,qty)=>fetch('/api/game/shop/buy',{method:'POST',headers:authHeaders(token),body:JSON.stringify({[kind==='ball'?'ballId':'itemId']:+id,qty})});try{let tokens=read();if(!tokens||!tokens.accessToken)return {ok:false,reason:'Sessão sem token'};let gold=await readGold(tokens.accessToken);let qty=unitPrice>0&&Number.isFinite(gold)?Math.min(1000,Math.floor(gold/unitPrice)):1000;if(qty<=0)return {ok:false,bought:0,reason:'Gold insuficiente'};let r=await post(tokens.accessToken,qty);if(r.status===401&&tokens.refreshToken){const rr=await fetch('/api/auth/refresh',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({refreshToken:tokens.refreshToken})});if(rr.ok){tokens=await rr.json();save(tokens);gold=await readGold(tokens.accessToken);qty=unitPrice>0&&Number.isFinite(gold)?Math.min(1000,Math.floor(gold/unitPrice)):1000;if(qty<=0)return {ok:false,bought:0,reason:'Gold insuficiente'};r=await post(tokens.accessToken,qty);}}const j=await r.json().catch(()=>({}));if(!r.ok)return {ok:false,bought:0,reason:j.message||('HTTP '+r.status)};const bought=Number.isFinite(+j.bought)?Math.max(0,+j.bought):qty;if(bought<=0)return {ok:false,bought:0,reason:'A API não confirmou nenhuma unidade comprada'};try{const rr=await fetch('/api/characters/me',{headers:{Authorization:'Bearer '+tokens.accessToken}}),jj=await rr.json().catch(()=>({}));if(jj&&jj.character&&window.__poke&&window.__poke.api)window.__poke.api['/api/characters/me']=jj;}catch(x){}try{if(window.__poke&&window.__poke.sock&&window.__poke.sock.readyState===1)window.__poke.sock.send(JSON.stringify({type:'inv-get'}))}catch(x){}return {ok:true,bought};}catch(e){return {ok:false,bought:0,reason:e.message||'Erro na compra'};}})()`;
   // Compra usada pelas opções de configuração. Mantém a API legada, mas passa
   // pelo mesmo recuperador de cidade das compras do painel principal.
   const BUY_CONFIG_BALL = (ballId, qty) => `(async()=>{const ballId=${JSON.stringify(+ballId||0)},qty=${JSON.stringify(+qty||0)};try{const r=await fetch('/api/game/balls/buy',{method:'POST',headers:{'Content-Type':'application/json'},credentials:'include',body:JSON.stringify({ballId,qty})});const j=await r.json().catch(()=>({}));if(!r.ok)return {ok:false,reason:j.message||j.error||('HTTP '+r.status)};return {ok:true,bought:+j.bought||qty,gold:j.gold};}catch(e){return {ok:false,reason:e.message||'Erro na compra'};}})()`;
@@ -3442,21 +3725,41 @@ return {live,hasBalls,hasInv,balls,potions,revives,prevHunt:resumo(P.prev),shiny
       if (cardsOn) refreshCards(true);
     }
   }
-  async function buy1000Ball(i, kind, id, name) {
+  async function aguardarCompraAtualizada(i, kind, id, antes, comprado) {
+    const w = webviews[i];
+    if (!w || !antes) return true;
+    const chave = String(id), quantidadeAntes = kind === 'ball' ? +(antes.ballMap && antes.ballMap[chave] || 0) : +(antes.invMap && antes.invMap[chave] || 0);
+    const goldAntes = Number(antes.gold);
+    const esperado = quantidadeAntes + Math.max(1, +comprado || 0);
+    for (let tentativa = 0; tentativa < 30; tentativa++) {
+      await new Promise(resolve => setTimeout(resolve, 300));
+      const atual = await w.executeJavaScript(READ_STATE).catch(() => null);
+      if (!atual || !atual.ok) continue;
+      const quantidadeAtual = kind === 'ball' ? +(atual.ballMap && atual.ballMap[chave] || 0) : +(atual.invMap && atual.invMap[chave] || 0);
+      const saldoAtualizado = Number.isFinite(goldAntes) && Number.isFinite(+atual.gold) ? +atual.gold < goldAntes : false;
+      if (quantidadeAtual >= esperado && saldoAtualizado) return true;
+    }
+    return false;
+  }
+  async function buy1000Ball(i, kind, id, name, price) {
     const label = tabNames[i] || stName(i);
-    const { r, returnFailed } = await runMarkAction(i, BUY_1000_SUPPLY(kind, id));
+    const antes = typeof webviews !== 'undefined' && webviews[i] ? await webviews[i].executeJavaScript(READ_STATE).catch(() => null) : null;
+    const { r, returnFailed } = await runMarkAction(i, BUY_1000_SUPPLY(kind, id, price));
     if (!r?.ok || returnFailed) {
       const detail = r?.ok ? 'compra concluída, mas retorno à hunt não confirmado' : r?.reason || 'erro desconhecido';
       try { window.pokeAPI?.logError?.('compra-mark', label + ' · ' + name + ': ' + detail + (returnFailed && !r?.ok ? '; retorno à hunt não confirmado' : '')); } catch {}
     }
     try {
+      const atualizado = r?.ok ? await aguardarCompraAtualizada(i, kind, id, antes, r.bought) : false;
       const status = (r?.ok ? 'Compra concluída' : 'Compra não realizada: ' + (r?.reason || 'erro desconhecido')) + (returnFailed ? '; retorno à hunt não confirmado' : '');
       document.querySelectorAll('.cd-ball-buy').forEach(btn => {
         if (+btn.dataset.i === i && btn.dataset.kind === kind && btn.dataset.id === String(id)) {
-          btn.disabled = false; btn.textContent = '+1000'; btn.title = status;
+          btn.disabled = false; if (btn.classList) btn.classList.remove('is-busy'); btn.textContent = '+1000'; btn.title = atualizado ? status : (status + '; aguardando confirmação dos valores');
         }
       });
-      if (r?.ok) refreshCards();
+      stCache[i] = null;
+      refreshStats();
+      if (cardsOn) refreshCards(true);
     } catch {}
     return r;
   }
@@ -3514,7 +3817,7 @@ return {live,hasBalls,hasInv,balls,potions,revives,prevHunt:resumo(P.prev),shiny
       sellItemsBusy.delete(i);
       accountActionBusy.delete(i);
       try {
-        if (r?.ok) refreshCards();
+        if (r?.ok) { try { stCache[i] = null; bagIvCache[i] = null; refreshStats(); if (cardsOn) refreshCards(true); setTimeout(() => { try { stCache[i] = null; bagIvCache[i] = null; refreshStats(); if (cardsOn) refreshCards(true); } catch {} }, 350); } catch {} }
         const status = (r?.ok ? 'Venda concluída' : r?.cancelled ? 'Venda cancelada' : 'Venda não realizada: ' + (r?.reason || 'erro desconhecido')) + (returnFailed ? '; retorno à hunt não confirmado' : '');
         document.querySelectorAll('.cd-sell-safe').forEach(btn => {
           if (+btn.dataset.i === i) { btn.disabled = false; btn.textContent = 'Vender todos os itens permitidos'; btn.title = status; }
@@ -3580,7 +3883,7 @@ return {live,hasBalls,hasInv,balls,potions,revives,prevHunt:resumo(P.prev),shiny
       sellPokesBusy.delete(i);
       accountActionBusy.delete(i);
       try {
-        if (r?.ok) refreshCards();
+        if (r?.ok) { try { stCache[i] = null; bagIvCache[i] = null; refreshStats(); if (cardsOn) refreshCards(true); setTimeout(() => { try { stCache[i] = null; bagIvCache[i] = null; refreshStats(); if (cardsOn) refreshCards(true); } catch {} }, 350); } catch {} }
         const status = (r?.ok ? 'Venda concluída' : r?.cancelled ? 'Venda cancelada' : 'Venda não realizada: ' + (r?.reason || 'erro desconhecido')) + (returnFailed ? '; retorno à hunt não confirmado' : '');
         document.querySelectorAll('.cd-sell-pokes').forEach(btn => {
           if (+btn.dataset.i === i) { btn.disabled = false; btn.textContent = 'Vender Pokémon IV < 150'; btn.title = status; }
@@ -3609,7 +3912,7 @@ return {live,hasBalls,hasInv,balls,potions,revives,prevHunt:resumo(P.prev),shiny
       const confirmed = preview.stones.map(x => ({ id:+x.id, qty:+x.qty || 0 }));
       const out = await runMarkAction(i, SELL_SELECTED_STONES_SELECTED(ids, confirmed), true);
       r = out.r; returnFailed = out.returnFailed;
-      if (r?.ok) { stoneSelected[cid] = {}; try { localStorage.setItem('stoneSelected', JSON.stringify(stoneSelected)); } catch {} refreshCards(); }
+      if (r?.ok) { stoneSelected[cid] = {}; try { localStorage.setItem('stoneSelected', JSON.stringify(stoneSelected)); } catch {} try { stCache[i] = null; bagIvCache[i] = null; refreshStats(); if (cardsOn) refreshCards(true); setTimeout(() => { try { stCache[i] = null; bagIvCache[i] = null; refreshStats(); if (cardsOn) refreshCards(true); } catch {} }, 350); } catch {} }
     } catch (e) { r = { ok:false, reason:e?.message || 'erro desconhecido' }; }
     finally {
       const label = tabNames[i] || stName(i);
@@ -3623,7 +3926,7 @@ return {live,hasBalls,hasInv,balls,potions,revives,prevHunt:resumo(P.prev),shiny
     return r;
   }
   function openCharacterMarket(i) {
-    const w = webviews[i]; if (!w || off[i]) return;
+    const w = webviews[i]; if (!w || off[i]) return Promise.resolve({ ok:false, reason:'Painel indisponível' });
     const openMarketHere = `(async()=>{
       const wait=n=>new Promise(r=>setTimeout(r,n));
       const marketOpen=()=>!!document.querySelector('[class*="mkt2-"]');
@@ -3666,14 +3969,16 @@ return {live,hasBalls,hasInv,balls,potions,revives,prevHunt:resumo(P.prev),shiny
       }
       return {ok:false,reason:'controle do Market não encontrado nesta versão do jogo'};
     })()`;
-    w.executeJavaScript(openMarketHere).then(result => {
+    return w.executeJavaScript(openMarketHere).then(result => {
       if (!result || !result.ok) {
-        return window.alert('Não foi possível abrir o Market: ' + ((result && result.reason) || 'erro desconhecido') + '.');
+        window.alert('Não foi possível abrir o Market: ' + ((result && result.reason) || 'erro desconhecido') + '.');
+        return result || { ok:false, reason:'erro desconhecido' };
       }
       cardsOn = false;
       applyCards();
-      setTimeout(() => toggleExpand(i), 120);
-    }).catch(e => window.alert('Não foi possível abrir o Market: ' + (e && e.message ? e.message : 'erro desconhecido') + '.'));
+      setTimeout(() => maximizaPainel(i), 120);
+      return result;
+    }).catch(e => { window.alert('Não foi possível abrir o Market: ' + (e && e.message ? e.message : 'erro desconhecido') + '.'); return { ok:false, reason:e?.message || 'erro desconhecido' }; });
   }
   function openCharacterDepotLegacy(i) {
     const w = webviews[i]; if (!w || off[i]) return;
@@ -3729,11 +4034,11 @@ return {live,hasBalls,hasInv,balls,potions,revives,prevHunt:resumo(P.prev),shiny
       if (!result || !result.ok) return window.alert('Não foi possível abrir o Baú: ' + ((result && result.reason) || 'erro desconhecido') + '.');
       cardsOn = false;
       applyCards();
-      setTimeout(() => toggleExpand(i), 120);
+      setTimeout(() => maximizaPainel(i), 120);
     }).catch(e => window.alert('Não foi possível abrir o Baú: ' + (e && e.message ? e.message : 'erro desconhecido') + '.'));
   }
   function openCharacterDepot(i) {
-    const w=webviews[i];if(!w||off[i])return;
+    const w=webviews[i];if(!w||off[i])return Promise.resolve(false);
     const probe=`(()=>{
       const vis=e=>{if(!e)return false;const s=getComputedStyle(e),r=e.getBoundingClientRect();return s.display!=='none'&&s.visibility!=='hidden'&&r.width>0&&r.height>0};
       const rect=e=>{const r=e.getBoundingClientRect();return {x:r.left+r.width/2,y:r.top+r.height/2}};
@@ -3767,7 +4072,7 @@ return {live,hasBalls,hasInv,balls,potions,revives,prevHunt:resumo(P.prev),shiny
       if(!result||result.kind!=='click'||attempt>=4)return false;
       await clickReal(result.click);await delay(220);return run(attempt+1);
     };
-    openByHook().then(ok=>ok?true:run()).then(ok=>{if(!ok)return window.alert('Não foi possível abrir o Baú: o fluxo do Depot não foi concluído.');cardsOn=false;applyCards();setTimeout(()=>toggleExpand(i),120)}).catch(e=>window.alert('Não foi possível abrir o Baú: '+(e&&e.message?e.message:'erro desconhecido')+'.'));
+    return openByHook().then(ok=>ok?true:run()).then(ok=>{if(!ok){window.alert('Não foi possível abrir o Baú: o fluxo do Depot não foi concluído.');return false;}cardsOn=false;applyCards();setTimeout(()=>maximizaPainel(i),120);return true;}).catch(e=>{window.alert('Não foi possível abrir o Baú: '+(e&&e.message?e.message:'erro desconhecido')+'.');return false;});
   }
   // base medida por conta e hunt: media (EWMA) do que CADA conta realmente fez ali (gold/h, xp/h, capturas/h).
   // amostra a taxa acumulada da sessao (ja e uma media) quando a hunt rodou tempo suficiente pra estabilizar.
@@ -3875,11 +4180,131 @@ return {live,hasBalls,hasInv,balls,potions,revives,prevHunt:resumo(P.prev),shiny
     renderProtectedItems();
   }
   document.getElementById('protectItemsBtn').onclick = openProtectedItems;
-  document.getElementById('protectClose').onclick = () => protectOverlay.classList.remove('show');
-  protectOverlay.onclick = e => { if (e.target === protectOverlay) protectOverlay.classList.remove('show'); };
+  document.getElementById('protectClose').onclick = () => { protectOverlay.classList.remove('show'); focarJogo(); };
+  protectOverlay.onclick = e => { if (e.target === protectOverlay) { protectOverlay.classList.remove('show'); focarJogo(); } };
   protectSearch.oninput = renderProtectedItems;
   protectFilter.onchange = renderProtectedItems;
-  document.addEventListener('keydown', e => { if (e.key === 'Escape' && protectOverlay.classList.contains('show')) protectOverlay.classList.remove('show'); });
+  document.addEventListener('keydown', e => { if (e.key === 'Escape' && protectOverlay.classList.contains('show')) { protectOverlay.classList.remove('show'); focarJogo(); } });
+  const pokemonOverlay = document.getElementById('pokemonOverlay');
+  const pokemonGrid = document.getElementById('pokemonGrid');
+  const pokemonSearch = document.getElementById('pokemonSearch');
+  const pokemonAccount = document.getElementById('pokemonAccount');
+  const pokemonIv = document.getElementById('pokemonIv');
+  const pokemonType = document.getElementById('pokemonType');
+  const pokemonRarity = document.getElementById('pokemonRarity');
+  const pokemonShiny = document.getElementById('pokemonShiny');
+  const pokemonSort = document.getElementById('pokemonSort');
+  const pokemonCount = document.getElementById('pokemonCount');
+  let pokemonRows = [], pokemonLoading = false;
+  const pokemonActionBusy = new Set();
+  const POKEMON_LOCK_ACTION = (id, locked) => `(async()=>{try{const P=window.__poke;if(!P||!P.sock||P.sock.readyState!==1)return{ok:false,reason:'WebSocket do jogo indisponível'};const raw=P.ws&&P.ws.pokes;const list=Array.isArray(raw)?raw:(raw&&Array.isArray(raw.list)?raw.list:[]);const p=list.find(x=>String(x&&x.id)===String(${JSON.stringify(String(id))}));if(!p)return{ok:false,reason:'Pokémon não encontrado na conta'};const next=!!${locked?'true':'false'};P.sock.send(JSON.stringify({type:'poke-lock',pokeId:p.id,locked:next}));p.locked=next;p.isLocked=next;try{P.sock.send(JSON.stringify({type:'pokes-get'}));}catch(x){}await new Promise(r=>setTimeout(r,350));const fresh=(P.ws&&P.ws.pokes);const freshList=Array.isArray(fresh)?fresh:(fresh&&Array.isArray(fresh.list)?fresh.list:[]);const current=freshList.find(x=>String(x&&x.id)===String(p.id));return{ok:true,locked:!!(current&&(current.locked??current.isLocked??current.protected??current.sellLocked))};}catch(e){return{ok:false,reason:e&&e.message||'Não foi possível alterar o cadeado'};}})()`;
+  const CHAT_POKEMON_ACTION = p => `(()=>{try{const id=${JSON.stringify(String(p.id||''))};if(!id)return{ok:false,reason:'Pokémon sem identificador válido'};const msg='[poke:'+id+'] ';const all=[...document.querySelectorAll('input,textarea')];let input=all.find(x=>x.closest('.chat-box')&&/Falar em|Talk in/i.test(x.placeholder||''));if(!input)input=all.find(x=>/Falar em|Talk in/i.test(x.placeholder||'')&&!/Message to|Mensagem para/i.test(x.placeholder||''));if(!input)return{ok:false,reason:'Campo público do chat não encontrado'};const proto=input instanceof HTMLTextAreaElement?HTMLTextAreaElement.prototype:HTMLInputElement.prototype;const setter=Object.getOwnPropertyDescriptor(proto,'value')&&Object.getOwnPropertyDescriptor(proto,'value').set;if(setter)setter.call(input,msg);else input.value=msg;input.dispatchEvent(new InputEvent('input',{bubbles:true,inputType:'insertText',data:msg}));input.dispatchEvent(new Event('change',{bubbles:true}));input.focus();return{ok:true,prepared:true};}catch(e){return{ok:false,reason:e&&e.message||'Não foi possível preparar o Pokémon no chat'};}})()`;
+  const pokemonFilters = () => ({
+    name: String(pokemonSearch.value || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, ''),
+    account: +pokemonAccount.value || -1, iv: Math.max(0, Math.min(192, +pokemonIv.value || 0)),
+    quality: +pokemonRarity.value || 0, type: String(pokemonType.value || '').toLowerCase(), shiny: !!pokemonShiny.checked, sort: pokemonSort.value || 'iv-desc'
+  });
+  function renderPokemonDepot() {
+    const f = pokemonFilters();
+    const contas = [...new Map(pokemonRows.map(x => [x.accountId, x.accountName])).entries()].sort((a, b) => a[1].localeCompare(b[1], 'pt-BR'));
+    pokemonAccount.innerHTML = '<option value="-1">Todas as contas</option>' + contas.map(x => '<option value="' + x[0] + '">' + esc(x[1]) + '</option>').join('');
+    pokemonAccount.value = String(f.account);
+    const list = pokemonRows.filter(p => {
+      const n = String(p.name || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+      const tipos = [p.type1, p.type2].map(x => String(x || '').toLowerCase()).filter(Boolean);
+      return (f.account < 0 || p.accountId === f.account) && (!f.name || n.includes(f.name)) && (+p.ivTotal || 0) >= f.iv && (+p.quality || 0) >= f.quality && (!f.type || tipos.includes(f.type)) && (!f.shiny || !!p.shiny);
+    }).sort((a, b) => {
+      if (f.sort === 'iv-asc') return ((+a.ivTotal || 0) - (+b.ivTotal || 0)) || String(a.name || '').localeCompare(String(b.name || ''));
+      if (f.sort === 'level-desc') return ((+b.level || 0) - (+a.level || 0)) || ((+b.ivTotal || 0) - (+a.ivTotal || 0));
+      if (f.sort === 'level-asc') return ((+a.level || 0) - (+b.level || 0)) || ((+b.ivTotal || 0) - (+a.ivTotal || 0));
+      if (f.sort === 'name-asc') return String(a.name || '').localeCompare(String(b.name || ''), 'pt-BR');
+      return ((+b.ivTotal || 0) - (+a.ivTotal || 0)) || String(a.name || '').localeCompare(String(b.name || ''));
+    });
+    pokemonCount.textContent = list.length + (list.length === 1 ? ' exibido' : ' exibidos') + (pokemonLoading ? ' · atualizando…' : '');
+    if (!list.length) { pokemonGrid.innerHTML = '<div id="pokemonEmpty">Nenhum Pokémon encontrado com estes filtros.</div>'; return; }
+    pokemonGrid.innerHTML = list.map(p => {
+      const rare = RARO(+p.quality || 0), sid = dexId(+p.sid || 0);
+      const src = sid > 0 ? 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/' + (p.shiny ? 'shiny/' : '') + sid + '.png' : '';
+      const lock = p.locked ? '🔒' : '🔓';
+      return '<div class="pk-item cd-iv-poke" data-poke-id="' + esc(p.id) + '" data-iv-source="' + esc(p.accountId) + '" data-shared-name="' + esc(p.name) + '" data-shared-level="' + esc(p.level) + '" data-shared-iv="' + esc(p.ivTotal) + '" data-shared-quality="' + esc(p.quality) + '" data-shared-power="' + esc(p.power || 0) + '" title="Shift + clique envia ao chat · mantenha os dois botões do mouse pressionados para abrir a calculadora de IV">' + (src ? '<img src="' + src + '" alt="" onerror="this.style.visibility=\'hidden\'">' : '')
+        + '<span class="pk-name">' + (p.shiny ? '✨ ' : '') + esc(p.name) + '<small class="pk-meta">' + esc(p.accountName) + ' · Lv' + nf(p.level) + '<br><b style="color:#55e6d3">IV ' + nf(p.ivTotal) + '/192</b> · <span style="color:' + rare[1] + '">' + rare[0] + ' ×' + (+p.quality || 0).toFixed(2) + '</span></small></span><button type="button" class="pk-lock" data-poke-lock="1" title="' + (p.locked ? 'Desbloquear Pokémon' : 'Bloquear Pokémon') + '">' + lock + '</button></div>';
+    }).join('');
+    pokemonGrid.querySelectorAll('.cd-iv-poke').forEach(el => {
+      el.addEventListener('mouseenter', () => ivRecebeSimples(el));
+      el.addEventListener('click', e => {
+        if (e.target.closest('[data-poke-lock]')) return;
+        if (!e.shiftKey) return;
+        e.preventDefault(); e.stopPropagation();
+        const p = pokemonRows.find(x => String(x.id) === String(el.dataset.pokeId) && +x.accountId === +el.dataset.ivSource);
+        if (p) sharePokemonInChat(p);
+      });
+      const lockBtn = el.querySelector('[data-poke-lock]');
+      if (lockBtn) lockBtn.addEventListener('click', e => {
+        e.preventDefault(); e.stopPropagation();
+        const p = pokemonRows.find(x => String(x.id) === String(el.dataset.pokeId) && +x.accountId === +el.dataset.ivSource);
+        if (p) togglePokemonLock(p);
+      });
+      el.addEventListener('mousedown', e => {
+        ivMouseButtons |= e.button === 0 ? 1 : e.button === 2 ? 2 : 0;
+        if (ivMouseButtons === 3) { e.preventDefault(); ivRecebeSimples(el, true); }
+      });
+      el.addEventListener('mouseup', e => { ivMouseButtons &= e.button === 0 ? ~1 : e.button === 2 ? ~2 : ~0; });
+      el.addEventListener('contextmenu', e => { if (ivMouseButtons === 3) e.preventDefault(); });
+    });
+  }
+  async function togglePokemonLock(p) {
+    const key = p.accountId + ':' + p.id;
+    if (pokemonActionBusy.has(key)) return;
+    pokemonActionBusy.add(key);
+    try {
+      const r = await webviews[p.accountId].executeJavaScript(POKEMON_LOCK_ACTION(p.id, !p.locked));
+      if (!r || !r.ok) throw new Error(r && r.reason || 'Não foi possível alterar o cadeado');
+      p.locked = !!r.locked;
+      renderPokemonDepot();
+    } catch (e) { try { window.pokeAPI.notify('Pokémons', e.message || 'Falha ao alterar o cadeado'); } catch {} }
+    finally { pokemonActionBusy.delete(key); }
+  }
+  async function sharePokemonInChat(p) {
+    const key = 'chat:' + p.accountId + ':' + p.id;
+    if (pokemonActionBusy.has(key)) return;
+    pokemonActionBusy.add(key);
+    try {
+      const r = await webviews[p.accountId].executeJavaScript(CHAT_POKEMON_ACTION(p));
+      if (!r || !r.ok) throw new Error(r && r.reason || 'Não foi possível citar o Pokémon no chat');
+    } catch (e) { try { window.pokeAPI.notify('Pokémons', e.message || 'Falha ao preparar o Pokémon no chat'); } catch {} }
+    finally { pokemonActionBusy.delete(key); }
+  }
+  async function openPokemonDepot() {
+    pokemonOverlay.classList.add('show');
+    pokemonSearch.focus();
+    renderPokemonDepot();
+    if (pokemonLoading) return;
+    pokemonLoading = true; renderPokemonDepot();
+    const novos = [];
+    for (let i = 0; i < count; i++) {
+      if (off[i] || !webviews[i]) continue;
+      try {
+        const d = await webviews[i].executeJavaScript(READ_STATE);
+        if (!d || !d.ok || !Array.isArray(d.bagPokes)) continue;
+        const accountName = String(d.name || tabNames[i] || stName(i));
+        d.bagPokes.forEach(p => novos.push(Object.assign({ accountId: i, accountName }, p)));
+      } catch {}
+    }
+    pokemonRows = novos;
+    pokemonLoading = false;
+    renderPokemonDepot();
+  }
+  document.getElementById('pokemonBtn').onclick = openPokemonDepot;
+  document.getElementById('pokemonClose').onclick = () => { pokemonOverlay.classList.remove('show'); focarJogo(); };
+  pokemonOverlay.onclick = e => { if (e.target === pokemonOverlay) { pokemonOverlay.classList.remove('show'); focarJogo(); } };
+  pokemonSearch.oninput = renderPokemonDepot;
+  pokemonAccount.onchange = renderPokemonDepot;
+  pokemonIv.onchange = renderPokemonDepot;
+  pokemonType.onchange = renderPokemonDepot;
+  pokemonRarity.onchange = renderPokemonDepot;
+  pokemonShiny.onchange = renderPokemonDepot;
+  pokemonSort.onchange = renderPokemonDepot;
+  document.addEventListener('keydown', e => { if (e.key === 'Escape' && pokemonOverlay.classList.contains('show')) { pokemonOverlay.classList.remove('show'); focarJogo(); } });
   async function refreshItemsCatalog(showMessage) {
     itensCache = null; itensCacheT = Date.now();
     let loaded = null;
@@ -3917,8 +4342,8 @@ return {live,hasBalls,hasInv,balls,potions,revives,prevHunt:resumo(P.prev),shiny
   const layoutsOverlay = document.getElementById('layoutsOverlay');
   const renderLayouts = () => document.querySelectorAll('[data-layout]').forEach(ch => { ch.checked = !!gameLayouts[ch.dataset.layout]; });
   document.getElementById('layoutsBtn').onclick = () => { renderLayouts(); layoutsOverlay.classList.add('show'); };
-  document.getElementById('layoutsClose').onclick = () => layoutsOverlay.classList.remove('show');
-  layoutsOverlay.onclick = e => { if (e.target === layoutsOverlay) layoutsOverlay.classList.remove('show'); };
+  document.getElementById('layoutsClose').onclick = () => { layoutsOverlay.classList.remove('show'); focarJogo(); };
+  layoutsOverlay.onclick = e => { if (e.target === layoutsOverlay) { layoutsOverlay.classList.remove('show'); focarJogo(); } };
   document.querySelectorAll('[data-layout]').forEach(ch => ch.onchange = () => { gameLayouts[ch.dataset.layout] = ch.checked; lsSet('gameLayouts', JSON.stringify(gameLayouts)); applyGameLayoutsAll(); });
   function carregaHunts() {
     if (huntsCache || Date.now() - huntsCacheT < 60e3) return;
@@ -4050,8 +4475,8 @@ return {live,hasBalls,hasInv,balls,potions,revives,prevHunt:resumo(P.prev),shiny
   }
   const tlOv = document.getElementById('tlOverlay');
   document.getElementById('tierBtn').onclick = () => { menu.classList.remove('show'); tlOv.classList.add('show'); renderTier(); };
-  document.getElementById('tlClose').onclick = () => tlOv.classList.remove('show');
-  tlOv.onclick = (e) => { if (e.target === tlOv) tlOv.classList.remove('show'); };
+  document.getElementById('tlClose').onclick = () => { tlOv.classList.remove('show'); focarJogo(); };
+  tlOv.onclick = (e) => { if (e.target === tlOv) { tlOv.classList.remove('show'); focarJogo(); } };
   // resolve o nome do shiny (o field as vezes so manda o speciesId)
   const nomeShiny = (x) => (x.n && !/^#/.test(x.n)) ? x.n : (creaturesById[x.sid] || x.n || ('#' + (x.sid || '?')));
   function spark(vals, color) {
@@ -4083,8 +4508,25 @@ return {live,hasBalls,hasInv,balls,potions,revives,prevHunt:resumo(P.prev),shiny
     if (!best || !(best.gph > alvo)) return '';
     return ' <span title="' + esc(cap(best.k)) + ': ' + ncs(best.gph) + '/h ' + t('cdBetterTip') + '" style="color:#f2c665;cursor:help">\u2197</span>';
   };
-  async function refreshCards(force) {
+  function bindBusyButton(btn, loadingText, normalText, action) {
+    if (!btn) return;
+    btn.onclick = e => {
+      if (e) e.stopPropagation();
+      if (btn.disabled) return;
+      btn.disabled = true;
+      btn.classList.add('is-busy');
+      btn.textContent = loadingText;
+      Promise.resolve().then(action).finally(() => {
+        if (!btn.isConnected) return;
+        btn.disabled = false;
+        btn.classList.remove('is-busy');
+        btn.textContent = normalText;
+      });
+    };
+  }
+  async function renderCards(force) {
     if (!cardsOn || (cdBusy && Date.now() - cdBusy < 8000)) return; // nao destroi o DOM durante o gesto, mas destrava sozinho se o mouseup se perder
+    atualizaCotacaoDiamante();
     // Guarda do tick: com foco num campo do painel, o redesenho passivo espera (nao apagar o que
     // o usuario digita). Mudou um select/checkbox, o handler chama com force: sem ele, o foco
     // que fica no campo segurava o redesenho pra sempre (bug do "filtro nao aplica").
@@ -4099,10 +4541,18 @@ return {live,hasBalls,hasInv,balls,potions,revives,prevHunt:resumo(P.prev),shiny
       if (pc && Date.now() - pc.t < 30000) d = pc.d;
       else try { d = await webviews[i].executeJavaScript(READ_STATE); } catch {}
       if (!d || !d.ok) { rows.push({ i, dot, cid:recentHuntSlots[i] || '', name: nm0, st: 'wait' }); continue; }
-      if (!cardsCfg.hide.bagIv) {
-        try { d.bagPokes = await webviews[i].executeJavaScript(READ_BAG_IV); } catch { d.bagPokes = []; }
+      const depotPokes = Array.isArray(d.bagPokes) ? d.bagPokes : [];
+      if (perfOn('depotIv') && !cardsCfg.hide.bagIv) {
+        const bc = bagIvCache[i];
+        if (bc && Date.now() - bc.t < BAG_IV_CACHE_MS) d.bagPokes = bc.v;
+        else {
+          try {
+            d.bagPokes = await webviews[i].executeJavaScript(READ_BAG_IV);
+            bagIvCache[i] = { t: Date.now(), v: Array.isArray(d.bagPokes) ? d.bagPokes : [] };
+          } catch { d.bagPokes = []; }
+        }
       }
-      if (!cardsCfg.hide.pokedexTp && i === dexAccSel) {
+      if (perfOn('pokedex') && !cardsCfg.hide.pokedexTp && i === dexAccSel) {
         try { d.dexList = await webviews[i].executeJavaScript(READ_POKEDEX_DOM); } catch { d.dexList = []; }
       }
       if (d.name && tabNames[i] !== d.name) tabNames[i] = d.name;
@@ -4127,7 +4577,7 @@ return {live,hasBalls,hasInv,balls,potions,revives,prevHunt:resumo(P.prev),shiny
         }
       });
       if (d.usedList && d.usedList.length) (utBase[i] || (utBase[i] = { init: 0 })).init = 1; // a partir daqui, especie inedita = tentativa da sessao
-      rows.push({ i, dot, cid: d.cid || '', name: d.name || nm0, gold: +d.gold || 0, st: 'on', hunt: d.hunt || '', huntSlug: d.huntSlug || '', secs: a.seconds || 0, gph: a.gph || 0, xph: a.xph || 0, kph: a.kph || 0, caps: a.captures || 0, sh: a.shinyFound || 0, best, last, since: a.sinceCatch || 0, balls: d.ballList || [], supplies: d.supplyList || [], stones: d.stoneList || [], bagPokes: d.bagPokes || [], dexList: d.dexList || [], lead: (d.team || []).find(p => p.ld) || (d.team || [])[0] || null, shares: d.chatShares || [], team: d.team || [], inv: d.invMap || {}, tlv: +d.level || 0, ballTotal: +d.balls || 0, pots: +d.potions || 0, aBalls: a.ballsUsed || 0, aPots: a.potsUsed || 0 });
+      rows.push({ i, dot, cid: d.cid || '', name: d.name || nm0, gold: +d.gold || 0, diamonds: +d.diamonds || 0, st: 'on', hunt: d.hunt || '', huntSlug: d.huntSlug || '', secs: a.seconds || 0, gph: a.gph || 0, xph: a.xph || 0, kph: a.kph || 0, caps: a.captures || 0, sh: a.shinyFound || 0, best, last, since: a.sinceCatch || 0, balls: d.ballList || [], supplies: d.supplyList || [], stones: d.stoneList || [], bagPokes: d.bagPokes || [], depotPokes, dexList: d.dexList || [], lead: (d.team || []).find(p => p.ld) || (d.team || [])[0] || null, shares: d.chatShares || [], team: d.team || [], inv: d.invMap || {}, tlv: +d.level || 0, ballTotal: +d.balls || 0, pots: +d.potions || 0, aBalls: a.ballsUsed || 0, aPots: a.potsUsed || 0 });
     }
     dhist.push({ t: Date.now(), g: sumG, x: sumX });
     dhist = dhist.filter(p => p.t > Date.now() - 3600e3);
@@ -4137,6 +4587,9 @@ return {live,hasBalls,hasInv,balls,potions,revives,prevHunt:resumo(P.prev),shiny
     const on = rows.filter(r => r.st === 'on');
     on.sort((p, q) => { const a2 = valOf(p, dsort.k), b2 = valOf(q, dsort.k); return (a2 > b2 ? 1 : a2 < b2 ? -1 : 0) * dsort.d; });
     const ordered = on.concat(rows.filter(r => r.st !== 'on'));
+    // A seção visual de Times e IV segue sempre as contas físicas: primeira, segunda, terceira...
+    // A tabela continua podendo ser ordenada sem alterar essa sequência dos cartões.
+    const accountOrdered = rows.slice().sort((p, q) => p.i - q.i);
     const lost = Math.max(0, sumSF - sumSC);
     carregaHunts(); carregaItens(); // carrega o mapa id→nome sempre, pra resolver o nome do shiny mesmo com o ranking escondido
 
@@ -4144,11 +4597,15 @@ return {live,hasBalls,hasInv,balls,potions,revives,prevHunt:resumo(P.prev),shiny
     const SB = {};
     SB.kpis = () => {
       const kpi = (v, l, c) => '<div class="cd-kpi"><div class="v"' + (c ? ' style="color:' + c + '"' : '') + '>' + v + '</div><div class="l">' + l + '</div></div>';
+      const diamante = simpleDiamondQuote && +simpleDiamondQuote.goldPorDiamante > 0 ? ncs(Math.round(+simpleDiamondQuote.goldPorDiamante)) + ' / 💎1' : '–';
+      const diamondHist = simpleDiamondHist.filter(p => p.t > Date.now() - 24 * 3600e3);
+      const diamondGraph = spark(diamondHist.map(p => p.v), '#79c0ff');
       return '<div class="cd-kpis">'
         + kpi(ncs(sumG), t('cdGold'), sumG < 0 ? '#f0883e' : '#3fb950') + kpi(nc(sumX), t('cdXp'), '#79c0ff')
         + kpi(nf(sumK), t('cdKills')) + kpi(nf(sumC), t('cdCaps'))
         + kpi(nf(sumSF) + ' / ' + nf(sumSC), t('cdShiny'), sumSF > 0 ? '#f778ba' : null)
-        + kpi(ativos + ' / ' + count, t('cdActive'), '#3fb950') + '</div>';
+        + kpi(ativos + ' / ' + count, t('cdActive'), '#3fb950')
+        + '<div class="cd-kpi cd-diamond-kpi"><div class="v" style="color:#79c0ff">' + diamante + '</div><div class="l">💎 valor do diamante</div>' + diamondGraph + '</div></div>';
     };
     SB.today = () => {
       const T = totalDia(curDay), W = somaDias(7), A = somaDias(0);
@@ -4192,7 +4649,7 @@ return {live,hasBalls,hasInv,balls,potions,revives,prevHunt:resumo(P.prev),shiny
           + '<td>' + (r.st === 'on' ? nf(r.kph) : '—') + '</td>'
           + '<td>' + (r.st === 'on' ? nf(r.caps) : '—') + '</td>'
           + '<td style="color:' + ((r.sh || 0) > 0 ? '#f778ba' : '#8b949e') + '">' + (r.st === 'on' ? nf(r.sh) : '—') + '</td>'
-          + '<td>' + (r.best ? '<span style="color:' + (r.best.q ? RARO(+r.best.q)[1] : '#e6edf3') + '">' + esc(r.best.n) + '</span> <span style="color:#55e6d3">' + (+r.best.iv || 0) + '/192</span>' + (+r.best.q ? ' <span style="color:#f2c665">×' + (+r.best.q).toFixed(2) + '</span>' : '') : '—') + '</td>'
+          + '<td>' + (r.best ? '<span class="cd-iv-poke cd-best-poke" data-iv-source="' + r.i + '" data-shared-name="' + esc(r.best.n) + '" data-shared-level="' + (+r.best.lv || +r.best.level || 1) + '" data-shared-iv="' + (+r.best.iv || 0) + '" data-shared-quality="' + (+r.best.q || 1) + '" data-shared-power="' + (+r.best.pw || +r.best.power || 0) + '" title="Mantenha os dois botões do mouse pressionados para abrir a calculadora de IV"><span style="color:' + (r.best.q ? RARO(+r.best.q)[1] : '#e6edf3') + '">' + esc(r.best.n) + '</span> <span style="color:#55e6d3">' + (+r.best.iv || 0) + '/192</span>' + (+r.best.q ? ' <span style="color:#f2c665">×' + (+r.best.q).toFixed(2) + '</span>' : '') + '</span>' : '—') + '</td>'
           + '<td>' + (r.last ? '<span style="color:' + (r.last.q ? RARO(r.last.q)[1] : '#e6edf3') + '">' + esc(r.last.n) + '</span> <span style="color:#6e7681">' + fmtHM(r.last.t) + '</span>' + (r.since ? ' <span style="color:#f0883e">· ' + nf(r.since) + ' ' + ballIco + '</span>' : '') : '—') + '</td>'
           + '<td>' + stTxt + '</td></tr>';
       });
@@ -4215,12 +4672,12 @@ return {live,hasBalls,hasInv,balls,potions,revives,prevHunt:resumo(P.prev),shiny
       let s = '<div class="cd-sec"><div class="cd-h">Pokébolas e curas por personagem · +1000 compra para a conta da linha</div>';
       if (!types.length) return s + '<div class="cd-empty">' + t('cdWaiting') + '</div></div>';
       s += '<table class="cd-table"><thead><tr><th>Personagem</th>'
-        + types.map(b => '<th>' + esc(b.name) + (b.price > 0 ? '<span class="cd-item-price">×1000: $' + nf(b.price * 1000) + '</span>' : '') + '</th>').join('')
+        + types.map(b => '<th>' + esc(b.name) + (b.price > 0 ? '<span class="cd-item-price">$' + nf(b.price) + '</span>' : '') + '</th>').join('')
         + '</tr></thead><tbody>';
       rows.forEach(r => {
         const qty = {}; (r.balls || []).forEach(b => qty['ball:' + b.id] = +b.qty || 0); (r.supplies || []).forEach(b => qty['item:' + b.id] = +b.qty || 0);
         s += '<tr data-i="' + r.i + '"><td><span class="cd-dot" style="background:' + r.dot + '"></span>' + esc(r.name) + (r.st === 'on' ? '<span class="cd-account-gold">$' + nf(r.gold) + '</span>' : '') + '</td>'
-          + types.map(b => '<td style="color:' + (r.st === 'on' && qty[b.key] === 0 ? '#f0883e' : '#e6edf3') + '">' + (r.st === 'on' ? '<span class="cd-ball-cell"><span>' + nf(qty[b.key] || 0) + '</span><button class="cd-ball-buy" data-i="' + r.i + '" data-kind="' + b.kind + '" data-id="' + esc(b.id) + '" data-name="' + esc(b.name) + '" title="Comprar 1000 ' + esc(b.name) + ' para ' + esc(r.name) + '">+1000</button></span>' : '—') + '</td>').join('')
+          + types.map(b => '<td style="color:' + (r.st === 'on' && qty[b.key] === 0 ? '#f0883e' : '#e6edf3') + '">' + (r.st === 'on' ? '<span class="cd-ball-cell"><span>' + nf(qty[b.key] || 0) + '</span><button class="cd-ball-buy" data-i="' + r.i + '" data-kind="' + b.kind + '" data-id="' + esc(b.id) + '" data-name="' + esc(b.name) + '" data-price="' + (+b.price || 0) + '" title="Comprar até 1000 ' + esc(b.name) + ' para ' + esc(r.name) + '">+1000</button></span>' : '—') + '</td>').join('')
           + '</tr>';
       });
       return s + '</tbody><tfoot><tr><td>' + t('cdTotal') + '</td>'
@@ -4238,9 +4695,20 @@ return {live,hasBalls,hasInv,balls,potions,revives,prevHunt:resumo(P.prev),shiny
         if (pct >= 25) return ['Abaixo da média', '#f39a4b'];
         return ['Fraco', '#f05a62'];
       };
-      let s = '<div class="cd-sec"><div class="cd-h">Pokémon no Inventário (até 6 espaços) · não inclui Pokémon guardados</div>';
-      on.forEach(r => {
-        s += '<div style="margin:9px 0 5px;color:#adbac7;font-size:12px"><span class="cd-dot" style="background:' + r.dot + '"></span><b>' + esc(r.name) + '</b> · ' + nf((r.bagPokes || []).length) + ' Pokémon</div>';
+      let s = '<div class="cd-sec"><div class="cd-h">Times e IV · venda protegida por personagem · itens permitidos, Pokémon com IV &lt; 150 e Stones selecionadas</div>';
+      accountOrdered.forEach(r => {
+        const balance = '<span class="cd-team-balance"><span class="cd-dollar">💲' + nf(r.gold) + '</span><span class="cd-diamond">💎' + nf(r.diamonds) + '</span></span>';
+        const actions = r.st === 'on'
+          ? '<span class="cd-team-actions cd-team-sales"><button class="cd-sell-safe" data-i="' + r.i + '">Vender todos os itens permitidos</button><button class="cd-sell-pokes" data-i="' + r.i + '">Vender Pokémon IV &lt; 150</button></span>'
+          : '<span class="rt">—</span>';
+        const nav = r.st === 'on' ? '<span class="cd-team-nav"><button class="cd-open-market" data-i="' + r.i + '">Abrir Market</button><button class="cd-open-depot" data-i="' + r.i + '">📦 Abrir Baú</button></span>' : '';
+        s += '<div class="cd-team-head"><span class="cd-team-main"><span class="cd-team-identity"><span class="cd-dot" style="background:' + r.dot + '"></span><b>' + esc(r.name) + '</b>' + balance + ' · ' + nf((r.bagPokes || []).length) + ' Pokémon</span>' + nav + '</span>' + actions + '</div>';
+        if (r.st === 'on') {
+          const selected = stoneSelected[r.cid] || {};
+          s += '<div class="cd-team-actions" style="justify-content:flex-start;margin:0 0 8px 24px">'
+            + ((r.stones || []).length ? r.stones.map(x => '<label class="cd-stone-pick"><input class="cd-stone-check" type="checkbox" data-cid="' + esc(r.cid) + '" data-id="' + esc(x.id) + '"' + (selected[x.id] ? ' checked' : '') + '> ' + esc(x.name) + ' <b>×' + nf(x.qty) + '</b></label>').join('') : '<span class="cd-empty">Nenhuma Stone na bolsa</span>')
+            + ((r.stones || []).length ? '<button class="cd-sell-stones" data-i="' + r.i + '" data-cid="' + esc(r.cid) + '">Vender Stones selecionadas</button>' : '') + '</div>';
+        }
         if (!(r.bagPokes || []).length) { s += '<div class="cd-empty">Aguardando dados da bag…</div>'; return; }
         s += '<div style="overflow-x:auto"><table class="cd-table"><thead><tr><th>Pokémon</th><th>Level</th><th>Raridade</th><th>IV total</th><th>HP IV</th><th>ATK IV</th><th>DEF IV</th><th>SpA IV</th><th>SpD IV</th><th>VEL IV</th><th>Avaliação</th></tr></thead><tbody>';
         r.bagPokes.forEach(p => {
@@ -4256,19 +4724,33 @@ return {live,hasBalls,hasInv,balls,potions,revives,prevHunt:resumo(P.prev),shiny
       });
       return s + '</div>';
     };
-    SB.sellItems = () => {
-      let s = '<div class="cd-sec"><div class="cd-h">Venda protegida · Pokémon: somente IV menor que 150 e até Épico; nunca vende Lendário ou superior</div>';
-      rows.forEach(r => {
-        s += '<div class="cd-row"><span class="cd-dot" style="background:' + r.dot + '"></span><b class="rn">' + esc(r.name) + '</b>'
-          + (r.st === 'on' ? '<span style="display:flex;gap:7px;flex-wrap:wrap;justify-content:flex-end"><button class="cd-sell-safe" data-i="' + r.i + '">Vender todos os itens permitidos</button><button class="cd-sell-pokes" data-i="' + r.i + '">Vender Pokémon IV &lt; 150</button><button class="cd-open-market" data-i="' + r.i + '">Abrir Market</button><button class="cd-open-depot" data-i="' + r.i + '">📦 Abrir Baú</button></span>' : '<span class="rt">—</span>') + '</div>';
-        if (r.st === 'on') {
-          const selected = stoneSelected[r.cid] || {};
-          s += '<div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;padding:2px 6px 9px 24px">'
-            + ((r.stones || []).length ? r.stones.map(x => '<label class="cd-stone-pick"><input class="cd-stone-check" type="checkbox" data-cid="' + esc(r.cid) + '" data-id="' + esc(x.id) + '"' + (selected[x.id] ? ' checked' : '') + '> ' + esc(x.name) + ' <b>×' + nf(x.qty) + '</b></label>').join('') : '<span class="cd-empty">Nenhuma Stone na bolsa</span>')
-            + ((r.stones || []).length ? '<button class="cd-sell-stones" data-i="' + r.i + '" data-cid="' + esc(r.cid) + '">Vender Stones selecionadas</button>' : '') + '</div>';
-        }
+    SB.depotPokes = () => {
+      const f = depotPokeFilt;
+      const accountOptions = ['<option value="-1"' + (f.acc < 0 ? ' selected' : '') + '>Todas as contas</option>']
+        .concat(on.map(r => '<option value="' + r.i + '"' + (f.acc === r.i ? ' selected' : '') + '>' + esc(r.name) + '</option>')).join('');
+      const rarityOptions = [[0, 'Qualquer raridade'], [1, 'Comum ou melhor'], [1.3, 'Rara ou melhor'], [1.5, 'Épica ou melhor'], [1.7, 'Lendária ou melhor'], [2, 'Mítica ou melhor'], [3, 'Anciã ou melhor']]
+        .map(x => '<option value="' + x[0] + '"' + (f.q === x[0] ? ' selected' : '') + '>' + x[1] + '</option>').join('');
+      const lista = on.flatMap(r => (r.depotPokes || []).map(p => Object.assign({ account: r }, p))).filter(x =>
+        (f.acc < 0 || x.account.i === f.acc) && (!f.name || String(x.name || '').toLowerCase().includes(f.name)) &&
+        (+x.ivTotal || 0) >= f.iv && (+x.quality || 0) >= f.q && (!f.shiny || !!x.shiny)
+      ).sort((a, b) => ((+b.ivTotal || 0) - (+a.ivTotal || 0)) || String(a.name || '').localeCompare(String(b.name || '')));
+      let s = '<div class="cd-sec"><div class="cd-h">Pokémon do depot · todas as contas <span style="font-size:10px;color:#6e7681;text-transform:none">(' + nf(lista.length) + ' exibidos)</span></div>'
+        + '<div class="cd-cfg-row" style="display:flex;gap:5px;flex-wrap:wrap;margin-bottom:7px">'
+        + '<select id="cdDpAcc" class="cd-inp" title="Conta">' + accountOptions + '</select>'
+        + '<input id="cdDpName" type="text" class="cd-inp" style="width:105px" placeholder="🔎 Pokémon" value="' + esc(f.name) + '">'
+        + '<input id="cdDpIv" type="number" min="0" max="192" class="cd-inp" style="width:58px" title="IV mínimo" placeholder="IV ≥" value="' + (f.iv || '') + '">'
+        + '<select id="cdDpQ" class="cd-inp" title="Raridade">' + rarityOptions + '</select>'
+        + '<label class="cd-inp" style="cursor:pointer" title="Somente shiny">✨<input id="cdDpShiny" type="checkbox" style="margin-left:3px"' + (f.shiny ? ' checked' : '') + '></label></div>';
+      if (!lista.length) return s + '<div class="cd-empty">Nenhum Pokémon atende aos filtros.</div></div>';
+      s += '<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:6px">';
+      lista.forEach(p => {
+        const rare = RARO(+p.quality || 0), sid = dexId(+p.sid || 0);
+        const sprite = perfOn('images') && sid > 0 ? 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/' + (p.shiny ? 'shiny/' : '') + sid + '.png' : '';
+        s += '<div class="cd-row cd-iv-poke" data-iv-source="' + p.account.i + '" data-shared-name="' + esc(p.name) + '" data-shared-level="' + (+p.level || 0) + '" data-shared-iv="' + (+p.ivTotal || 0) + '" data-shared-quality="' + (+p.quality || 1) + '" data-shared-power="0" data-shared-shiny="' + (p.shiny ? '1' : '0') + '" title="' + esc(p.account.name) + ' · Pokémon do depot" style="padding:6px 7px;border:1px solid #263241;border-radius:8px;background:#101820">'
+          + (sprite ? '<img src="' + sprite + '" alt="" style="width:42px;height:42px;object-fit:contain;image-rendering:pixelated;flex:none" onerror="this.style.visibility=\'hidden\'">' : '')
+          + '<span class="rn"><b>' + (p.shiny ? '✨ ' : '') + esc(p.name) + '</b><br><span style="color:#adbac7">' + esc(p.account.name) + ' · Lv' + nf(p.level) + '</span><br><span style="color:#55e6d3">IV ' + nf(p.ivTotal) + '/192</span> <span style="color:' + rare[1] + '">' + rare[0] + ' ×' + (+p.quality || 0).toFixed(2) + '</span></span></div>';
       });
-      return s + '</div>';
+      return s + '</div></div>';
     };
     SB.recentHunts = () => {
       const canBack = rows.some(r => r.st === 'on' && (recentHunts[r.cid] || []).some(h => h && h.slug && h.slug !== r.huntSlug));
@@ -4317,23 +4799,33 @@ return {live,hasBalls,hasInv,balls,potions,revives,prevHunt:resumo(P.prev),shiny
     SB.team = () => {
       const M = window.PokeGridIvMath;
       const alvo = Math.max(1, Math.min(500, +(lsGet('cdPjLv') || 500)));
-      const cols = ordered.filter(r => r.st === 'on' && (r.team || []).length);
+      const cols = accountOrdered.filter(r => r.st === 'on');
       const poder = (p) => { // mesmo modulo do card de IV; sem base/qualidade/IV nao inventa numero
         const b = basesByName[String(p.name || '').toLowerCase()];
         if (!M || !b || !(+p.q > 0) || !(+p.ivt > 0) || !(+p.level > 0)) return null;
         const sp = { baseStats: { hp: b[0], atk: b[1], def: b[2], spa: b[3], spd: b[4], speed: b[5] } };
         try { return { agora: M.projectPokemon({ level: +p.level, quality: +p.q, ivTotal: +p.ivt, species: sp }, +p.level).power, proj: M.projectPokemon({ level: +p.level, quality: +p.q, ivTotal: +p.ivt, species: sp }, alvo).power }; } catch { return null; }
       };
-      const inner = cols.length ? '<div style="display:grid;grid-template-columns:repeat(' + Math.min(4, cols.length) + ',1fr);gap:12px">' + cols.map(r =>
-        '<div class="cd-team-col" style="--team-color:' + r.dot + '"><div class="cd-h" style="margin-bottom:4px"><span class="cd-dot" style="background:' + r.dot + '"></span>' + esc(r.name) + '</div>'
-        + (r.team || []).map(p => {
+      const inner = cols.length ? '<div style="display:grid;grid-template-columns:repeat(' + Math.min(4, cols.length) + ',1fr);gap:12px">' + cols.map(r => {
+        const balance = '<span class="cd-team-balance"><span class="cd-dollar">💲' + nf(r.gold) + '</span><span class="cd-diamond">💎' + nf(r.diamonds) + '</span></span>';
+        const actions = '<span class="cd-team-actions cd-team-sales"><button class="cd-sell-safe" data-i="' + r.i + '">Vender todos os itens permitidos</button><button class="cd-sell-pokes" data-i="' + r.i + '">Vender Pokémon IV &lt; 150</button></span>';
+        const nav = '<span class="cd-team-nav"><button class="cd-open-market" data-i="' + r.i + '">🏪 Abrir Market</button><button class="cd-open-depot" data-i="' + r.i + '">📦 Abrir Baú</button></span>';
+        const selected = stoneSelected[r.cid] || {};
+        const stones = '<div class="cd-team-actions" style="justify-content:flex-start;margin:0 0 7px 2px">'
+          + ((r.stones || []).length ? r.stones.map(x => '<label class="cd-stone-pick"><input class="cd-stone-check" type="checkbox" data-cid="' + esc(r.cid) + '" data-id="' + esc(x.id) + '"' + (selected[x.id] ? ' checked' : '') + '> ' + esc(x.name) + ' <b>×' + nf(x.qty) + '</b></label>').join('') : '<span class="cd-empty">Nenhuma Stone na bolsa</span>')
+          + ((r.stones || []).length ? '<button class="cd-sell-stones" data-i="' + r.i + '" data-cid="' + esc(r.cid) + '">Vender Stones selecionadas</button>' : '') + '</div>';
+        const slots = Array.from({ length: 6 }, (_, slot) => (r.team || [])[slot] || null);
+         return '<div class="cd-team-col" style="--team-color:' + r.dot + '"><div class="cd-team-head" style="margin:0 0 5px"><span class="cd-team-main"><span class="cd-team-identity"><span class="cd-dot" style="background:' + r.dot + '"></span><b>' + esc(r.name) + '</b>' + balance + '</span>' + nav + '</span>' + actions + '</div>' + stones
+        + slots.map((p, slot) => {
+          if (!p) return '<div class="cd-row cd-team-empty"><span class="cd-team-slot">' + (slot + 1) + '</span><span class="cd-empty">Slot vazio</span></div>';
           const pw = poder(p);
-          return '<div class="cd-row cd-iv-poke" data-iv-source="' + r.i + '" data-shared-name="' + esc(p.name) + '" data-shared-level="' + (+p.level || 0) + '" data-shared-iv="' + (+p.ivt || 0) + '" data-shared-quality="' + (+p.q || 1) + '" data-shared-power="0" data-shared-shiny="' + (p.shiny ? '1' : '0') + '" title="Passe o mouse para ver este Pokémon na calculadora de IV" style="flex-wrap:wrap"><span class="rn">' + (p.ld ? '⭐ ' : '') + (p.shiny ? '✨ ' : '') + esc(p.name) + ' <b style="color:#adbac7">Lv' + nf(p.level) + '</b></span>'
+          return '<div class="cd-row cd-iv-poke cd-team-poke" data-iv-source="' + r.i + '" data-hunt-account="' + r.i + '" data-shared-name="' + esc(p.name) + '" data-shared-level="' + (+p.level || 0) + '" data-shared-iv="' + (+p.ivt || 0) + '" data-shared-quality="' + (+p.q || 1) + '" data-shared-power="0" data-shared-shiny="' + (p.shiny ? '1' : '0') + '" title="Duplo clique para preencher no PIW Tools Hunt" style="flex-wrap:wrap"><span class="cd-team-slot">' + (slot + 1) + '</span><span class="rn">' + (p.ld ? '⭐ ' : '') + (p.shiny ? '✨ ' : '') + esc(p.name) + ' <b style="color:#adbac7">Lv' + nf(p.level) + '</b></span>'
             + (p.ivt != null ? '<span style="color:#55e6d3">' + nf(p.ivt) + '/192</span>' : '')
             + (+p.q ? '<span style="color:#f2c665">×' + (+p.q).toFixed(2) + '</span>' : '')
             + (pw ? '<span style="color:#3fb950" title="' + t('ivcPower') + '">' + nf(pw.agora) + '</span><span style="color:#8ab4ff" title="Lv' + alvo + '">→' + nf(pw.proj) + '</span>' : '')
             + '</div>';
-        }).join('') + '</div>').join('') + '</div>' : '<div class="cd-empty">' + t('cdNone') + '</div>';
+        }).join('') + '</div>';
+      }).join('') + '</div>' : '<div class="cd-empty">' + t('cdNone') + '</div>';
       return '<div class="cd-sec"><div class="cd-h">' + t('cdTeams') + '</div>'
         + '<div class="cd-cfg-row" style="margin-bottom:6px">' + t('cdProjLv') + ' <input id="cdPjLv" type="number" min="1" max="500" class="cd-inp" style="width:64px" value="' + alvo + '"></div>' + inner + '</div>'; };
     SB.inv = () => {
@@ -4362,13 +4854,13 @@ return {live,hasBalls,hasInv,balls,potions,revives,prevHunt:resumo(P.prev),shiny
       if (modo === 'sess') arr = arr.filter(s => s.sess > 0);
       else if (modo === 'targets') arr = arr.filter(s => shinyTargets[s.sid]);
       arr.sort((p, q) => val(q) - val(p));
-      const spr = 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/';
+        const spr = perfOn('images') ? 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/' : '';
       const opts = [['total', t('cdTotal')], ['sess', t('stSession')], ['targets', '🎯 ' + t('cdTargets')]];
       return '<div class="cd-sec"><div class="cd-h" style="display:flex;align-items:center;gap:8px">' + t('cdShinyTried') + ' <span style="color:#586069;font-weight:400">(' + arr.length + ')</span>'
         + '<select id="cdStMode" style="margin-left:auto">' + opts.map(o => '<option value="' + o[0] + '"' + (modo === o[0] ? ' selected' : '') + '>' + o[1] + '</option>').join('') + '</select></div>'
         + (arr.length ? '<div class="cd-shgrid">' + arr.map(s => '<div class="cd-sh" title="' + esc(s.name || ('#' + s.sid)) + (s.caught ? ' ✓' : '') + ' · ' + nf(val(s)) + ' ' + t('stTries') + '">'
           + '<span class="cd-sh-st' + (shinyTargets[s.sid] ? ' on' : '') + '" data-sid="' + s.sid + '" title="' + t('cdTargetsMark') + '">' + (shinyTargets[s.sid] ? '★' : '☆') + '</span>'
-          + '<img class="cd-sh-img" src="' + spr + dexId(s.sid) + '.png" alt="" loading="lazy" onerror="this.style.visibility=\'hidden\'">'
+          + (spr ? '<img class="cd-sh-img" src="' + spr + dexId(s.sid) + '.png" alt="" loading="lazy" onerror="this.style.visibility=\'hidden\'">' : '')
           + '<div class="cd-sh-n">' + (s.caught ? '<span style="color:#3fb950">✓</span> ' : '') + esc(s.name || ('#' + s.sid)) + '</div>'
           + '<div class="cd-sh-t">' + nf(val(s)) + ' ' + ballIco + '</div>'
           + ((modo === 'sess' ? s.byAcc.filter(b => b.sess > 0) : s.byAcc).length ? '<div class="cd-sh-acc">' + (modo === 'sess' ? s.byAcc.filter(b => b.sess > 0) : s.byAcc).map(b => '<span><span class="cd-sh-dot" style="background:' + b.dot + '"></span>' + nf(modo === 'sess' ? b.sess : b.attempts) + '</span>').join('') + '</div>' : '')
@@ -4456,10 +4948,10 @@ return {live,hasBalls,hasInv,balls,potions,revives,prevHunt:resumo(P.prev),shiny
     };
     SB.shared = () => {
       const shMap = {};
-      rows.forEach(r => (r.shares || []).forEach(x2 => { shMap[x2.fr + '|' + x2.n + '|' + x2.iv + '|' + x2.lv] = x2; }));
+      rows.forEach(r => (r.shares || []).forEach(x2 => { shMap[x2.fr + '|' + x2.n + '|' + x2.iv + '|' + x2.lv] = Object.assign({ accountId:r.i }, x2); }));
       const shList = Object.values(shMap).sort((p, q) => q.t - p.t).slice(0, 8);
       return '<div class="cd-sec"><div class="cd-h">' + t('cdShared') + '</div>'
-        + (shList.length ? shList.map(x2 => '<div class="cd-row cd-shared-poke" data-shared-name="' + esc(x2.n) + '" data-shared-level="' + (+x2.lv || 0) + '" data-shared-iv="' + (+x2.iv || 0) + '" data-shared-quality="' + (+x2.q || 1) + '" data-shared-power="' + (+x2.pw || 0) + '" data-shared-shiny="' + (x2.sh ? '1' : '0') + '" title="Passe o mouse para ver este Pokémon na calculadora de IV"><span class="rn">' + (x2.sh ? '✨ ' : '') + '<b style="color:' + RARO(+x2.q || 1)[1] + '">' + esc(x2.n) + '</b>' + (+x2.lv ? ' <span style="color:#7d8590">Lv ' + (+x2.lv || 0) + '</span>' : '') + ' <span style="color:#7d8590">· ' + esc(x2.fr || '?') + '</span></span>' + (+x2.iv ? '<span style="color:#55e6d3">' + (+x2.iv || 0) + '/192</span>' : '') + (+x2.q ? '<span style="color:#f2c665">×' + (+x2.q).toFixed(2) + '</span>' : '') + '<span class="rt">' + fmtHM(x2.t) + '</span></div>').join('') : '<div class="cd-empty">' + t('cdNone') + '</div>') + '</div>';
+        + (shList.length ? shList.map(x2 => '<div class="cd-row cd-shared-poke" data-chat-player="' + esc(x2.fr || '') + '" data-chat-account="' + (+x2.accountId || 0) + '" data-shared-name="' + esc(x2.n) + '" data-shared-level="' + (+x2.lv || 0) + '" data-shared-iv="' + (+x2.iv || 0) + '" data-shared-quality="' + (+x2.q || 1) + '" data-shared-power="' + (+x2.pw || 0) + '" data-shared-shiny="' + (x2.sh ? '1' : '0') + '" title="' + esc(x2.body || ('Mensagem original de ' + (x2.fr || '?'))) + '"><span class="rn">' + (x2.sh ? '✨ ' : '') + '<b style="color:' + RARO(+x2.q || 1)[1] + '">' + esc(x2.n) + '</b>' + (+x2.lv ? ' <span style="color:#7d8590">Lv ' + (+x2.lv || 0) + '</span>' : '') + ' <span style="color:#7d8590">· ' + esc(x2.fr || '?') + '</span></span>' + (+x2.iv ? '<span style="color:#55e6d3">' + (+x2.iv || 0) + '/192</span>' : '') + (+x2.q ? '<span style="color:#f2c665">×' + (+x2.q).toFixed(2) + '</span>' : '') + '<span class="rt">' + fmtHM(x2.t) + '</span></div>').join('') : '<div class="cd-empty">' + t('cdNone') + '</div>') + '</div>';
     };
     SB.pokedexTp = () => {
       const selectedRow = rows.find(r => r.i === dexAccSel);
@@ -4481,7 +4973,7 @@ return {live,hasBalls,hasInv,balls,potions,revives,prevHunt:resumo(P.prev),shiny
       s += '<div style="font-size:10px;color:#7d8590">Ordenado pelo level da hunt · clique nos Pokémon com <b style="color:#79c0ff">TP</b></div><div class="cd-dex-grid">';
       list.forEach(p => {
         const caught = p.caught ? '<span style="color:#3fb950">✓ Capturado</span>' : '<span>Não capturado</span>';
-        const inner = '<img src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/' + (+p.no || 0) + '.png" alt=""><span style="min-width:0"><div class="nm">' + esc(p.name) + '</div><div class="mt">Lv ' + nf(p.level) + ' · ' + caught + (p.hunt ? ' · <b style="color:#79c0ff">TP</b>' : '') + '</div></span>';
+        const inner = (perfOn('images') ? '<img src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/' + (+p.no || 0) + '.png" alt="">' : '') + '<span style="min-width:0"><div class="nm">' + esc(p.name) + '</div><div class="mt">Lv ' + nf(p.level) + ' · ' + caught + (p.hunt ? ' · <b style="color:#79c0ff">TP</b>' : '') + '</div></span>';
         s += p.hunt ? '<button class="cd-dex-poke cd-dex-go" data-slug="' + esc(p.hunt.slug || '') + '" data-name="' + esc(p.hunt.name || p.name) + '">' + inner + '</button>' : '<div class="cd-dex-poke no-tp">' + inner + '</div>';
       });
       return s + '</div></div>';
@@ -4491,6 +4983,10 @@ return {live,hasBalls,hasInv,balls,potions,revives,prevHunt:resumo(P.prev),shiny
     let h = '<div class="cd-top"><span class="cd-tt">' + t('cardsShort') + '</span><button id="cdGear" class="' + (cardsCfgOpen ? 'on' : '') + '" title="' + t('cdConfig') + '">⚙</button></div>';
     if (cardsCfgOpen) h += '<div class="cd-cfg"><div class="cd-cfg-h">' + t('cdConfigH') + '</div>'
       + cardsCfg.order.map(s => '<div class="cd-cfg-row" draggable="true" data-s="' + s + '"><span class="cd-grip">⋮⋮</span><label><input type="checkbox" data-sec="' + s + '"' + (cardsCfg.hide[s] ? '' : ' checked') + '> ' + cdLabel(s) + '</label></div>').join('')
+      + '<div class="cd-cfg-h" style="margin-top:10px">Desempenho / PC fraco</div>'
+      + '<div class="cd-cfg-row"><label><input type="checkbox" id="cdPerfLow"' + (perfCfg.low ? ' checked' : '') + '> Modo PC fraco</label></div>'
+      + '<div class="cd-cfg-row" style="display:block;font-size:10px;color:#7d8590;line-height:1.4">Desative módulos pesados sem interromper login, farm, compras e vendas.</div>'
+      + ['depotIv', 'pokedex', 'chat', 'trend', 'market', 'images'].map(k => '<div class="cd-cfg-row"><label><input type="checkbox" data-perf="' + k + '"' + ((!perfCfg.low || perfCfg.modules[k]) ? ' checked' : '') + '> ' + ({ depotIv: 'Depot / IV', pokedex: 'Pokédex e sprites', chat: 'Chat', trend: 'Gráficos e histórico', market: 'Pesquisa de mercado / diamante', images: 'Imagens' }[k]) + '</label></div>').join('')
       + '<div class="cd-cfg-h" style="margin-top:10px">' + t('alLocalTitle') + '</div>'
       + '<div class="cd-cfg-row" style="display:block;font-size:10px;color:#7d8590;line-height:1.4">' + t('alLocalHint') + '</div>'
       + ['shiny', 'down', 'stalled', 'balls', 'faint'].map(k => '<div class="cd-cfg-row"><label><input type="checkbox" id="cdAl_' + k + '"' + (alLocal[k] ? ' checked' : '') + '> ' + t('alLocal_' + k) + '</label></div>').join('')
@@ -4503,6 +4999,7 @@ return {live,hasBalls,hasInv,balls,potions,revives,prevHunt:resumo(P.prev),shiny
     let secHtml = '';
     cardsCfg.order.forEach(sec => {
       if (cardsCfg.hide[sec] || !SB[sec]) return;
+      if ((!perfOn('pokedex') && sec === 'pokedexTp') || (!perfOn('trend') && sec === 'trend') || (!perfOn('chat') && sec === 'shared')) return;
       secHtml += '<div class="cd-it" data-s="' + sec + '" style="grid-column:span ' + cdW(sec) + '"><span class="cd-mv" draggable="true" title="' + t('cdMove') + '">⋮⋮</span><span class="cd-rz" title="' + t('cdResize') + '"></span><span class="cd-rz2" title="' + t('cdResizeV') + '"></span>' + SB[sec]() + '</div>';
     });
     h += '<div class="cd-cols">' + secHtml + '</div>';
@@ -4532,10 +5029,36 @@ return {live,hasBalls,hasInv,balls,potions,revives,prevHunt:resumo(P.prev),shiny
       el.addEventListener('mouseup', e => { ivMouseButtons &= e.button === 0 ? ~1 : e.button === 2 ? ~2 : ~0; });
       el.addEventListener('contextmenu', e => { if (ivMouseButtons === 3) e.preventDefault(); });
     });
+    cardsEl.querySelectorAll('.cd-shared-poke').forEach(el => el.addEventListener('dblclick', e => {
+      e.preventDefault(); e.stopPropagation();
+      openSimpleChat(el.dataset.chatPlayer || '', +el.dataset.chatAccount);
+    }));
+    cardsEl.querySelectorAll('.cd-team-poke').forEach(el => el.addEventListener('dblclick', async () => {
+      const r = ordered.find(x => x.i === +el.dataset.huntAccount);
+      const nome = String(el.dataset.sharedName || '').trim();
+      const nivel = +el.dataset.sharedLevel || 0;
+      const p = r && (r.team || []).find(x => String(x.name || '').toLowerCase() === nome.toLowerCase() && (+x.level || 0) === nivel);
+      const b = r && (r.bagPokes || []).find(x => String(x.name || '').toLowerCase() === nome.toLowerCase() && (+x.level || 0) === nivel);
+      const st = b && b.stats || {};
+      if (!window.pokeAPI || !p || !nome || !(nivel > 0)) return;
+      const opened = await window.pokeAPI.openHuntTool({ pokemon: nome, level: nivel, routeTarget: Math.max(nivel, +r.tlv || 300), hp: st.hp, atk: st.atk, def: st.def, spatk: st.spa, spdef: st.spd, speed: st.vel });
+      if (opened && window.pokeAPI.notify) window.pokeAPI.notify('PIW Tools', nome + ' foi preenchido na calculadora Hunt.');
+    }));
 
     // config: engrenagem, checkboxes e arraste pra reordenar seções
     const gear = cardsEl.querySelector('#cdGear'); if (gear) gear.onclick = () => { cardsCfgOpen = !cardsCfgOpen; refreshCards(true); };
     cardsEl.querySelectorAll('.cd-cfg input[data-sec]').forEach(chk => chk.onchange = () => { cardsCfg.hide[chk.dataset.sec] = !chk.checked; saveCardsCfg(); refreshCards(true); });
+    const perfRepaint = () => { cdHtmlAnt = ''; refreshCards(true); };
+    const perfLow = cardsEl.querySelector('#cdPerfLow'); if (perfLow) perfLow.onchange = () => {
+      perfCfg.low = !!perfLow.checked;
+      savePerfCfg();
+      perfRepaint();
+    };
+    cardsEl.querySelectorAll('.cd-cfg input[data-perf]').forEach(chk => chk.onchange = () => {
+      perfCfg.modules[chk.dataset.perf] = !!chk.checked;
+      savePerfCfg();
+      perfRepaint();
+    });
     // filtros das capturas, nivel de projecao do time e busca do inventario
     const fcSave = () => { try { lsSet('cdFC', JSON.stringify(cdFC)); } catch {} cdHtmlAnt = ''; refreshCards(true); };
     const fcP = cardsEl.querySelector('#cdFcP'); if (fcP) fcP.onchange = () => { cdFC.p = +fcP.value; fcP.blur(); fcSave(); };
@@ -4546,6 +5069,11 @@ return {live,hasBalls,hasInv,balls,potions,revives,prevHunt:resumo(P.prev),shiny
     const fcSh = cardsEl.querySelector('#cdFcSh'); if (fcSh) fcSh.onchange = () => { cdFC.sh = fcSh.checked ? 1 : 0; fcSave(); };
     const pjLv = cardsEl.querySelector('#cdPjLv'); if (pjLv) pjLv.onchange = () => { try { lsSet('cdPjLv', String(Math.max(1, Math.min(500, +pjLv.value || 500)))); } catch {} pjLv.blur(); cdHtmlAnt = ''; refreshCards(true); };
     const invF = cardsEl.querySelector('#cdInvF'); if (invF) invF.onchange = () => { try { lsSet('cdInvF', String(invF.value || '').slice(0, 30)); } catch {} invF.blur(); cdHtmlAnt = ''; refreshCards(true); };
+    const dpAcc = cardsEl.querySelector('#cdDpAcc'); if (dpAcc) dpAcc.onchange = () => { depotPokeFilt.acc = +dpAcc.value; refreshCards(true); };
+    const dpName = cardsEl.querySelector('#cdDpName'); if (dpName) dpName.onchange = () => { depotPokeFilt.name = String(dpName.value || '').trim().slice(0, 30).toLowerCase(); dpName.blur(); refreshCards(true); };
+    const dpIv = cardsEl.querySelector('#cdDpIv'); if (dpIv) dpIv.onchange = () => { depotPokeFilt.iv = Math.max(0, Math.min(192, numLivre(dpIv.value))); dpIv.blur(); refreshCards(true); };
+    const dpQ = cardsEl.querySelector('#cdDpQ'); if (dpQ) dpQ.onchange = () => { depotPokeFilt.q = Math.max(0, +dpQ.value || 0); refreshCards(true); };
+    const dpShiny = cardsEl.querySelector('#cdDpShiny'); if (dpShiny) dpShiny.onchange = () => { depotPokeFilt.shiny = !!dpShiny.checked; refreshCards(true); };
     // secao Hoje: metas e exportar CSV
     const gg = cardsEl.querySelector('#cdGoalG'); if (gg) gg.onchange = () => { goals.g = Math.max(0, +gg.value || 0); saveGoals(); gg.blur(); refreshCards(true); };
     const gc = cardsEl.querySelector('#cdGoalC'); if (gc) gc.onchange = () => { goals.c = Math.max(0, +gc.value || 0); saveGoals(); gc.blur(); refreshCards(true); };
@@ -4635,19 +5163,11 @@ return {live,hasBalls,hasInv,balls,potions,revives,prevHunt:resumo(P.prev),shiny
     };
     cardsEl.querySelectorAll('.cd-ball-buy').forEach(btn => btn.onclick = e => {
       e.stopPropagation();
-      btn.disabled = true; btn.textContent = '…';
-      buy1000Ball(+btn.dataset.i, btn.dataset.kind || 'ball', btn.dataset.id || '', btn.dataset.name || '');
+      btn.disabled = true; btn.classList.add('is-busy'); btn.textContent = 'Comprando…';
+      buy1000Ball(+btn.dataset.i, btn.dataset.kind || 'ball', btn.dataset.id || '', btn.dataset.name || '', +btn.dataset.price || 0);
     });
-    cardsEl.querySelectorAll('.cd-sell-safe').forEach(btn => btn.onclick = e => {
-      e.stopPropagation();
-      btn.disabled = true; btn.textContent = 'Vendendo…';
-      sellSafeItems(+btn.dataset.i);
-    });
-    cardsEl.querySelectorAll('.cd-sell-pokes').forEach(btn => btn.onclick = e => {
-      e.stopPropagation();
-      btn.disabled = true; btn.textContent = 'Vendendo…';
-      sellSafePokes(+btn.dataset.i);
-    });
+    cardsEl.querySelectorAll('.cd-sell-safe').forEach(btn => bindBusyButton(btn, 'Vendendo…', 'Vender todos os itens permitidos', () => sellSafeItems(+btn.dataset.i)));
+    cardsEl.querySelectorAll('.cd-sell-pokes').forEach(btn => bindBusyButton(btn, 'Vendendo…', 'Vender Pokémon IV < 150', () => sellSafePokes(+btn.dataset.i)));
     cardsEl.querySelectorAll('.cd-stone-check').forEach(chk => chk.onchange = e => {
       e.stopPropagation();
       const cid = chk.dataset.cid, id = chk.dataset.id;
@@ -4655,21 +5175,9 @@ return {live,hasBalls,hasInv,balls,potions,revives,prevHunt:resumo(P.prev),shiny
       stoneSelected[cid][id] = chk.checked;
       try { localStorage.setItem('stoneSelected', JSON.stringify(stoneSelected)); } catch {}
     });
-    cardsEl.querySelectorAll('.cd-sell-stones').forEach(btn => btn.onclick = e => {
-      e.stopPropagation();
-      btn.disabled = true; btn.textContent = 'Vendendo Stones…';
-      sellSelectedStones(+btn.dataset.i, btn.dataset.cid || '');
-    });
-    cardsEl.querySelectorAll('.cd-open-market').forEach(btn => btn.onclick = e => {
-      e.stopPropagation();
-      btn.disabled = true; btn.textContent = 'Abrindo…';
-      openCharacterMarket(+btn.dataset.i);
-    });
-    cardsEl.querySelectorAll('.cd-open-depot').forEach(btn => btn.onclick = e => {
-      e.stopPropagation();
-      btn.disabled = true; btn.textContent = 'Abrindo…';
-      openCharacterDepot(+btn.dataset.i);
-    });
+    cardsEl.querySelectorAll('.cd-sell-stones').forEach(btn => bindBusyButton(btn, 'Vendendo…', 'Vender Stones selecionadas', () => sellSelectedStones(+btn.dataset.i, btn.dataset.cid || '')));
+    cardsEl.querySelectorAll('.cd-open-market').forEach(btn => bindBusyButton(btn, 'Abrindo…', '🏪 Abrir Market', () => openCharacterMarket(+btn.dataset.i)));
+    cardsEl.querySelectorAll('.cd-open-depot').forEach(btn => bindBusyButton(btn, 'Abrindo…', '📦 Abrir Baú', () => openCharacterDepot(+btn.dataset.i)));
     const dexModeEl = cardsEl.querySelector('#cdDexMode'); if (dexModeEl) dexModeEl.onchange = () => {
       dexMode = dexModeEl.value; lsSet('dexMode', dexMode); refreshCards(true);
     };
@@ -4693,12 +5201,19 @@ return {live,hasBalls,hasInv,balls,potions,revives,prevHunt:resumo(P.prev),shiny
     cardsEl.querySelectorAll('.cd-fav').forEach(f => f.onclick = () => { const k = f.dataset.h; if (huntFavs[k]) delete huntFavs[k]; else huntFavs[k] = 1; try { lsSet('huntFavs', JSON.stringify(huntFavs)); } catch {} refreshCards(true); });
     cardsEl.querySelectorAll('.cd-hide').forEach(f => f.onclick = () => { const k = f.dataset.h; if (huntHidden[k]) delete huntHidden[k]; else huntHidden[k] = 1; try { lsSet('huntHidden', JSON.stringify(huntHidden)); } catch {} refreshCards(true); });
   }
+  let cardsRefreshPromise = null;
+  async function refreshCards(force) {
+    if (cardsRefreshPromise) return cardsRefreshPromise;
+    cardsRefreshPromise = renderCards(force);
+    try { return await cardsRefreshPromise; } finally { cardsRefreshPromise = null; }
+  }
   function applyCards() {
     document.body.classList.toggle('cards-on', cardsOn);
     cardsBtn.classList.toggle('on', cardsOn);
     lsSet('cardsOn', cardsOn ? '1' : '0');
     webviews.forEach((w, i) => { if (off[i] || !w) return; try { w.setAudioMuted(cardsOn || muted); w.executeJavaScript(ultraScript(cardsOn)).catch(() => {}); w.executeJavaScript(ecoScript(ecoFps())).catch(() => {}); w.executeJavaScript(chatScript(cardsOn || chatHidden)).catch(() => {}); } catch {} });
     if (cardsOn) { cdHtmlAnt = ''; cardsEl.innerHTML = '<div class="cd-empty" style="padding:20px">' + t('cdWaiting') + '</div>'; refreshCards(); }
+    else focarJogo();
   }
   cardsBtn.onclick = () => { cardsOn = !cardsOn; applyCards(); };
   // Keepalive: um toque barato em cada painel ligado, de 30 em 30s, MESMO com a janela
@@ -4720,7 +5235,7 @@ return {live,hasBalls,hasInv,balls,potions,revives,prevHunt:resumo(P.prev),shiny
   function resetSessao() {
     if (!window.confirm(t('resetConfirm'))) return;
     webviews.forEach((w, i) => { if (off[i] || !w) return; try { w.executeJavaScript(RESET_SESS).catch(() => {}); } catch {} });
-    dhist = []; // zera a tendencia (sparklines) tambem
+    dhist = []; // zera a tendencia da sessao; o historico local do diamante permanece salvo
     utBase.length = 0; sessSnap.length = 0; // shinies tentados "sessao" recomecam; e a semente antiga nao ressuscita a sessao zerada
     refreshStats(); if (cardsOn) refreshCards();
   }
@@ -4805,8 +5320,8 @@ return {live,hasBalls,hasInv,balls,potions,revives,prevHunt:resumo(P.prev),shiny
   }
   const scOverlay = document.getElementById('scOverlay');
   document.getElementById('scriptsBtn').onclick = () => { renderScriptsList(); scOverlay.classList.add('show'); };
-  document.getElementById('scClose').onclick = () => scOverlay.classList.remove('show');
-  scOverlay.onclick = (e) => { if (e.target === scOverlay) scOverlay.classList.remove('show'); };
+  document.getElementById('scClose').onclick = () => { scOverlay.classList.remove('show'); focarJogo(); };
+  scOverlay.onclick = (e) => { if (e.target === scOverlay) { scOverlay.classList.remove('show'); focarJogo(); } };
   document.getElementById('scAddUrl').onclick = (e) => instalaPorUrl(document.getElementById('scUrl').value.trim(), e.target);
   // arrastar .user.js: SO com o modal de scripts aberto, pra um arraste acidental sobre o jogo
   // nao abrir nada nem tentar instalar
@@ -4843,7 +5358,7 @@ return {live,hasBalls,hasInv,balls,potions,revives,prevHunt:resumo(P.prev),shiny
   // mouse num pokémon. O cálculo continua dentro do painel (é lá que estão as fórmulas e a busca
   // dos atributos-base), então aqui é exibição e entrada, sem fórmula duplicada.
   const ivEl = document.getElementById('ivCard');
-  let ivAberto = lsGet('ivCardOpen') === '1', ivDados = null, ivFonte = -1;
+  let ivAberto = lsGet('ivCardOpen') === '1', ivDados = null, ivFonte = -1, ivMarketTimer = null;
   let ivPos = null; try { ivPos = (() => { const p = lsObj('ivCardPos'); return typeof p.x === 'number' && typeof p.y === 'number' ? p : null; })(); } catch {}
   const TIPO_COR = { normal:'#a8a878', fire:'#f08030', water:'#6890f0', electric:'#f8d030', grass:'#78c850', ice:'#98d8d8', fighting:'#c03028', poison:'#a040a0', ground:'#e0c068', flying:'#a890f0', psychic:'#f85888', bug:'#a8b820', rock:'#b8a038', ghost:'#705898', dragon:'#7038f8', dark:'#705848', steel:'#b8b8d0', fairy:'#ee99ac',
     fogo:'#f08030', agua:'#6890f0', água:'#6890f0', eletrico:'#f8d030', elétrico:'#f8d030', planta:'#78c850', gelo:'#98d8d8', lutador:'#c03028', luta:'#c03028', veneno:'#a040a0', terra:'#e0c068', voador:'#a890f0', psiquico:'#f85888', psíquico:'#f85888', inseto:'#a8b820', pedra:'#b8a038', fantasma:'#705898', dragao:'#7038f8', dragão:'#7038f8', sombrio:'#705848', metal:'#b8b8d0', aco:'#b8b8d0', aço:'#b8b8d0', fada:'#ee99ac' };
@@ -4880,6 +5395,7 @@ return {live,hasBalls,hasInv,balls,potions,revives,prevHunt:resumo(P.prev),shiny
     } catch { return null; }
   }
   function ivRender() {
+    if (ivMarketTimer) { clearTimeout(ivMarketTimer); ivMarketTimer = null; }
     ivEl.classList.toggle('show', ivAberto);
     lsSet('ivCardOpen', ivAberto ? '1' : '0');
     if (!ivAberto) return;
@@ -4892,6 +5408,13 @@ return {live,hasBalls,hasInv,balls,potions,revives,prevHunt:resumo(P.prev),shiny
       const raro = d.qualidade ? RARO(+d.qualidade) : null;
       const kpi = (k, v, c) => '<div class="iv-kpi"><div class="k">' + k + '</div><div class="v"' + (c ? ' style="color:' + c + '"' : '') + '>' + v + '</div></div>';
       const kpiInp = (k, id, val, step) => '<div class="iv-kpi"><div class="k">' + k + '</div><input class="iv-inp" id="' + id + '" type="number" step="' + step + '" value="' + val + '"></div>';
+      const dinheiro = (v, sinal) => v == null ? '–' : (sinal || '') + '💵 ' + nf(Math.round(+v));
+      const diamantes = (v, sinal) => v == null ? '–' : (sinal || '') + '💎 ' + nf(Math.round(+v));
+      const ofertaMercado = (x, vazio) => x ? '<div class="v">IV ' + nf(+x.iv || 0) + '<br><span class="iv-price-gold">' + dinheiro(x.gold) + '</span><br><span class="iv-price-diamond">' + diamantes(x.diamantes) + '</span></div>' : '<div class="v" title="Sem referência nesta direção">' + (vazio || '–') + '</div>';
+      const m = d.mercado;
+      const mercadoHtml = '<div class="iv-market"><div class="iv-market-h">🔎 Estimativa de mercado <button id="ivMarketSearch">Pesquisar</button></div>'
+        + (m && m.ok ? '<div class="iv-market-grid"><div class="iv-market-cell"><div class="k">IV abaixo</div>' + ofertaMercado(m.abaixo, '_') + '</div><div class="iv-market-cell"><div class="k">Estimativa</div><div class="v">' + dinheiro(m.estimativa && m.estimativa.gold, m.estimativa && m.estimativa.sinal) + '<br>' + diamantes(m.estimativa && m.estimativa.diamantes, m.estimativa && m.estimativa.sinal) + '</div></div><div class="iv-market-cell"><div class="k">IV acima</div>' + ofertaMercado(m.acima, '+') + '</div></div><div class="iv-market-note">' + (m.amostras ? nf(m.amostras) + ' oferta(s) da espécie analisada. Comparação por ' + esc(m.raridade || 'raridade') + (m.fallbackRaridade ? ' (incluída raridade vizinha por falta de comparativo).' : '.') : 'Nenhuma oferta encontrada para esta espécie nas páginas consultadas.') + '</div>' : '<div class="iv-market-note">' + (m && m.reason ? 'A pesquisa não conseguiu consultar as ofertas: ' + esc(m.reason) : 'Clique em Pesquisar para consultar o Market em segundo plano, sem abrir ou alterar a tela.') + '</div>')
+        + '</div>';
       // sprite: mesma lista branca estrita do saneador, e ainda escapada no atributo
       const sprOk = (u) => typeof u === 'string' && IV_SPR_OK.test(u);
       const spr = d.sprite && sprOk(d.sprite.still) ? d.sprite : null;
@@ -4914,6 +5437,7 @@ return {live,hasBalls,hasInv,balls,potions,revives,prevHunt:resumo(P.prev),shiny
               + '<div><div class="iv-pot-t" style="color:' + corPot + '">' + esc(d.classificacao.texto || '') + '</div>'
               + '<div class="iv-pot-d">' + esc(d.classificacao.descricao || '') + '</div></div></div>';
           })() : '')
+        + mercadoHtml
         + '<div class="iv-sec">' + t('ivcStats') + ' <span style="color:#586069;text-transform:none">(' + (+d.percentual || 0).toFixed(1) + '% · ' + (raro ? '<span style="color:' + raro[1] + '">' + raro[0] + '</span> ×' + (+d.qualidade).toFixed(2) : '') + ')</span></div>'
         + '<div class="iv-grid">' + IVST.map(([k, c]) => {
             const iv = +((d.ivs || {})[k]) || 0, pct = Math.min(100, iv / (d.ivMaxInd || 32) * 100);
@@ -4940,6 +5464,14 @@ return {live,hasBalls,hasInv,balls,potions,revives,prevHunt:resumo(P.prev),shiny
     }
     ivPosiciona();
     const x = ivEl.querySelector('#ivX'); if (x) x.onclick = () => { ivAberto = false; ivRender(); };
+    const ms = ivEl.querySelector('#ivMarketSearch');
+    if (ms) ms.onclick = () => {
+      ms.disabled = true; ms.classList.add('is-loading'); ms.textContent = '⏳ Pesquisando…';
+      const w = webviews[ivFonte];
+      const iv = +((ivDados && ivDados.ivTotal) || 0);
+      const consultar = () => { if (!w) return Promise.resolve(null); return w.executeJavaScript('window.__pgIv && window.__pgIv.market(' + JSON.stringify({ pokemon: ivDados && ivDados.pokemon, iv }) + ')').catch(() => null); };
+      consultar().then(market => { if (market) { ivDados = Object.assign({}, ivDados, { mercado: market }); ivRender(); } else { ms.disabled = false; ms.classList.remove('is-loading'); ms.textContent = 'Pesquisar'; } }).catch(() => { ms.disabled = false; ms.classList.remove('is-loading'); ms.textContent = 'Pesquisar'; });
+    };
     const ab = ivEl.querySelector('#ivPanel'); // quem precisa das abas de golpes/comparar abre no painel
     if (ab) ab.onclick = () => { const w = webviews[ivFonte]; if (w) try { w.executeJavaScript("(()=>{const p=document.getElementById('pokemon-reader-panel');if(p&&p.classList.contains('minimized')){const b=document.getElementById('minimize');if(b)b.click();}})()").catch(() => {}); } catch {} };
     ivEl.querySelectorAll('.iv-inp, .iv-st-l input').forEach(inp => inp.onchange = ivRecalcula);
@@ -4952,6 +5484,15 @@ return {live,hasBalls,hasInv,balls,potions,revives,prevHunt:resumo(P.prev),shiny
       const up = () => { document.removeEventListener('mousemove', mv); document.removeEventListener('mouseup', up); hd.classList.remove('drag'); try { lsSet('ivCardPos', JSON.stringify(ivPos)); } catch {} };
       document.addEventListener('mousemove', mv); document.addEventListener('mouseup', up);
     });
+    if (ivAberto && d && !d.erro) {
+      ivMarketTimer = setTimeout(() => {
+        const w = webviews[ivFonte], iv = +((ivDados && ivDados.ivTotal) || 0);
+        if (!w || !ivDados || !ivAberto) return;
+        w.executeJavaScript('window.__pgIv && window.__pgIv.market(' + JSON.stringify({ pokemon: ivDados.pokemon, iv }) + ')').then(market => {
+          if (market && ivDados && ivAberto) { ivDados = Object.assign({}, ivDados, { mercado: market }); ivRender(); }
+        }).catch(() => {});
+      }, 60000);
+    }
   }
   // recalcula no painel de origem: a fórmula é a de lá, o app só manda os valores editados
   function ivRecalcula() {
@@ -5001,6 +5542,14 @@ return {live,hasBalls,hasInv,balls,potions,revives,prevHunt:resumo(P.prev),shiny
         poder: g.poder == null ? null : ivNum(g.poder), dano: ivNum(g.dano), eff: ivNum(g.eff), ativo: !!g.ativo
       })),
       poder: ivNum(p.poder), poderJogo: ivNum(p.poderJogo),
+      mercado: (() => {
+        const m = p.mercado && typeof p.mercado === 'object' ? p.mercado : null;
+        if (!m) return null;
+        const oferta = x => x && typeof x === 'object' ? { iv: ivNum(x.iv), gold: x.gold == null ? null : ivNum(x.gold), diamantes: x.diamantes == null ? null : ivNum(x.diamantes), rank: ivNum(x.rank), raridade: ivTxt(x.raridade, 20) } : null;
+        const est = m.estimativa && typeof m.estimativa === 'object' ? m.estimativa : {};
+        const dr = m.diamante && typeof m.diamante === 'object' ? m.diamante : {};
+        return { ok: !!m.ok, nome: ivTxt(m.nome), iv: ivNum(m.iv), abaixo: oferta(m.abaixo), acima: oferta(m.acima), raridade: ivTxt(m.raridade, 20), fallbackRaridade: !!m.fallbackRaridade, diamante: { goldPorDiamante: dr.goldPorDiamante == null ? null : ivNum(dr.goldPorDiamante), compra: dr.compra == null ? null : ivNum(dr.compra), venda: dr.venda == null ? null : ivNum(dr.venda), amostras: ivNum(dr.amostras) }, estimativa: { gold: est.gold == null ? null : ivNum(est.gold), diamantes: est.diamantes == null ? null : ivNum(est.diamantes), sinal: est.sinal === '+' ? '+' : '' }, amostras: Math.max(0, Math.min(999, ivNum(m.amostras))) };
+      })(),
       // volta pro painel no recálculo: só campos com tipo conferido
       pokemon: (() => { const q = p.pokemon && typeof p.pokemon === 'object' ? p.pokemon : {}; const o = { nome: ivTxt(q.nome), nivel: ivNum(q.nivel), ivAtual: ivNum(q.ivAtual), poder: ivNum(q.poder), qualidade: ivTxt(q.qualidade, 30), multiplicadorQualidade: ivNum(q.multiplicadorQualidade, 1), tipos: (Array.isArray(q.tipos) ? q.tipos : []).slice(0, 4).map(x => ivTxt(x, 20)) }; IVST.forEach(([k]) => o[k] = ivNum(q[k])); return o; })()
     };
@@ -5060,7 +5609,9 @@ return {live,hasBalls,hasInv,balls,potions,revives,prevHunt:resumo(P.prev),shiny
     o: () => menu.classList.toggle('show')                 // Opcoes
   };
   document.addEventListener('keydown', (e) => {
-    if (e.ctrlKey || e.altKey || e.metaKey) return; // combos (Ctrl+M etc) seguem intactos
+    if (e.key === 'F6') { e.preventDefault(); focarJogo(); return; }
+    if (cardsOn || statsOpen) return; // enquanto o dashboard esta aberto, nenhuma tecla e atalho do app
+    if (!e.ctrlKey && !e.altKey && !e.metaKey) return; // teclas soltas pertencem ao jogo
     const ae = document.activeElement;
     if (ae && (ae.isContentEditable || /^(INPUT|TEXTAREA|SELECT)$/.test(ae.tagName))) return;
     const fn = TECLAS_ATALHO[String(e.key || '').toLowerCase()];

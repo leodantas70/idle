@@ -3,6 +3,15 @@ const path = require('path');
 const fs = require('fs');
 const https = require('https'); // so pro webhook opcional do Discord
 const { applyOfficialUpdate } = require('./src/updater');
+const { checkLatestRelease, downloadAndInstall } = require('./src/release-updater');
+const APP_USER_MODEL_ID = 'com.asylum.pokegrid';
+const APP_ICON = path.join(__dirname, 'assets', 'darkgrid-pokeball.ico');
+const TRAY_ICON = path.join(__dirname, 'assets', 'darkgrid-pokeball.png');
+
+// Define a identidade antes da janela existir. O mesmo ID precisa ser usado
+// pelo executável, pela janela e pelos atalhos para o Windows agrupar o app
+// com o ícone do PokeGrid em vez do ícone genérico do Electron.
+try { app.setAppUserModelId(APP_USER_MODEL_ID); } catch {}
 
 // Somente a interface local pode usar os canais privilegiados. Os webviews do jogo
 // permanecem isolados da ponte IPC mesmo quando o conteúdo remoto é comprometido.
@@ -108,7 +117,7 @@ function baixaUserScript(url, saltos = 0) {
     let u;
     try { u = urlRaw(new URL(String(url))); } catch { resolve({ ok: false, error: 'Link invalido.' }); return; }
     if (u.protocol !== 'https:' || !US_HOSTS.has(u.hostname) || !/\.js$/i.test(u.pathname)) {
-      resolve({ ok: false, error: 'Use um link https do GitHub para um arquivo .js' }); return;
+      resolve({ ok: false, error: saltos ? 'O GitHub redirecionou para um endereco fora da lista (link de release?). Use o link do arquivo .js dentro do repositorio.' : 'Use um link https do GitHub para um arquivo .js' }); return;
     }
     const req = https.get(u, { headers: { 'User-Agent': 'PokeGrid/' + app.getVersion(), Accept: 'text/plain' } }, (res) => {
       if (res.statusCode >= 300 && res.statusCode < 400 && res.headers.location) {
@@ -126,7 +135,12 @@ function baixaUserScript(url, saltos = 0) {
         if (tam > 2 * 1024 * 1024) { parou = true; req.destroy(); resolve({ ok: false, error: 'O script passa de 2 MB.' }); }
         else corpo += c;
       });
-      res.on('end', () => { if (!parou) resolve({ ok: true, url: u.toString(), code: corpo }); });
+      res.on('end', () => {
+        if (parou) return;
+        const c0 = corpo.trim();
+        if (!c0 || c0[0] === '<') { resolve({ ok: false, error: 'Esse link nao devolveu um arquivo .js. Abra o arquivo no GitHub e copie o link dele.' }); return; }
+        resolve({ ok: true, url: u.toString(), code: corpo });
+      });
       res.on('error', () => { if (!parou) { parou = true; resolve({ ok: false, error: 'Falha ao ler o script.' }); } });
     });
     req.setTimeout(12000, () => req.destroy(new Error('timeout')));
@@ -154,8 +168,53 @@ ipcMain.handle('updater:apply', async (e) => {
     officialUpdateRunning = false;
   }
 });
-// Instancia unica: abrir o app de novo so foca a janela ja aberta.
+// Instancia unica: clicar no icone novamente traz a instancia que ja esta aberta
+// para frente, em vez de iniciar uma copia sem carregar o mesmo perfil.
 if (!app.requestSingleInstanceLock()) app.quit();
+else app.on('second-instance', () => {
+  try {
+    const w = BrowserWindow.getAllWindows()[0];
+    if (!w || w.isDestroyed()) return;
+    if (w.isMinimized()) w.restore();
+    if (!w.isVisible()) w.show();
+    w.focus();
+  } catch {}
+});
+let releaseUpdateRunning = false;
+ipcMain.handle('release:update-check', async (e) => {
+  if (!isTrustedUi(e)) return { ok:false, kind:'forbidden', message:'Origem não autorizada.' };
+  return checkLatestRelease({
+    currentVersion: app.getVersion(), packaged: app.isPackaged,
+    portable: !!process.env.PORTABLE_EXECUTABLE_FILE
+  });
+});
+ipcMain.handle('release:update-install', async (e) => {
+  if (!isTrustedUi(e)) return { ok:false, kind:'forbidden', message:'Origem não autorizada.' };
+  if (!app.isPackaged) return { ok:false, kind:'development', message:'A atualização pelo instalador só funciona na versão instalada.' };
+  if (releaseUpdateRunning) return { ok:false, kind:'busy', message:'Uma atualização já está em andamento.' };
+  releaseUpdateRunning = true;
+  try {
+    const release = await checkLatestRelease({
+      currentVersion: app.getVersion(), packaged:true,
+      portable: !!process.env.PORTABLE_EXECUTABLE_FILE
+    });
+    if (!release.ok || !release.updateAvailable) return release.ok ? { ok:false, kind:'current', message:'O PokeGrid já está atualizado.' } : release;
+    const asarUpdate = release.asset && release.asset.kind === 'asar';
+    const targetPath = asarUpdate ? path.join(process.resourcesPath, 'app.asar') : (process.env.PORTABLE_EXECUTABLE_FILE || process.execPath);
+    const result = await downloadAndInstall({
+      release, appPid:process.pid, targetPath,
+      portable:!!process.env.PORTABLE_EXECUTABLE_FILE,
+      tempRoot:app.getPath('temp')
+    });
+    if (result.ok) {
+      logErro('atualizador-release', 'preparado: ' + result.version + ' [' + result.asset + '] sha256=' + result.sha256);
+      // Dê tempo ao processo auxiliar destacado para iniciar antes de encerrar
+      // o Electron; em alguns Windows 11, 250 ms fazia o filho morrer junto.
+      setTimeout(() => app.exit(0), 1200);
+    }
+    return result;
+  } finally { releaseUpdateRunning = false; }
+});
 
 // Paineis presos ao dominio do jogo: nada de popup, e navegar o painel
 // (que carrega a sessao logada) para outro site abre no navegador de fora.
@@ -163,6 +222,7 @@ const GAME = 'https://poke.idleworld.online';
 // Limite deslizante: a pagina do jogo (ou um XSS nela) pedia abrir link e o navegador do
 // usuario abria sem limite. 3 por 10s cobre o uso real (clicar num link) e corta enxurrada.
 let aberturas = [];
+let huntToolWindow = null;
 const abreFora = (url) => {
   if (!/^https?:\/\//i.test(url)) return;
   const agora = Date.now();
@@ -171,6 +231,72 @@ const abreFora = (url) => {
   aberturas.push(agora);
   shell.openExternal(url);
 };
+const HUNT_TOOL_AUTOMATE = `(()=>{
+  const text=e=>String(e&&e.innerText||'').replace(/\\s+/g,' ').trim();
+  const buttons=()=>[...document.querySelectorAll('button')];
+  const find=s=>buttons().find(b=>s.test(text(b)));
+  let arena=false, activated=false, route=false, tries=0;
+  const tick=()=>{
+    tries++;
+    try {
+      const arenaBtn=find(/ARENA POKÉMON/i);
+      if (arenaBtn && !/border-cyan-300/.test(String(arenaBtn.className||''))) { arenaBtn.click(); arena=true; return; }
+      const activate=find(/ATIVAR SIMULADOR DE BATALHA/i);
+      if (arena && activate && !activated) { activate.click(); activated=true; return; }
+      const routeBtn=find(/ROTA OTIMIZADA/i);
+      if (activated && routeBtn && !/border-cyan-300/.test(String(routeBtn.className||''))) { routeBtn.click(); route=true; }
+      if ((activated && route) || tries >= 30) clearInterval(timer);
+    } catch {}
+  };
+  const timer=setInterval(tick,500); tick();
+  return true;
+})()`;
+function abrirHuntToolModal(url) {
+  const parent = BrowserWindow.getAllWindows()[0];
+  if (!parent || parent.isDestroyed()) return false;
+  try {
+    if (huntToolWindow && !huntToolWindow.isDestroyed()) {
+      huntToolWindow.loadURL(url).catch(() => {});
+      huntToolWindow.show(); huntToolWindow.focus();
+      return true;
+    }
+    huntToolWindow = new BrowserWindow({
+      parent, modal: true, width: 1440, height: 980, show: false,
+      title: 'PIW Tools · Simulador e rota do Pokémon',
+      icon: path.join(__dirname, 'assets', 'darkgrid-pokeball.ico'),
+      backgroundColor: '#0d1117',
+      webPreferences: { contextIsolation: true, nodeIntegration: false, sandbox: true }
+    });
+    huntToolWindow.webContents.setWindowOpenHandler(({ url: u }) => { abreFora(u); return { action: 'deny' }; });
+    huntToolWindow.webContents.on('did-finish-load', () => {
+      huntToolWindow.webContents.executeJavaScript(HUNT_TOOL_AUTOMATE).catch(() => {});
+    });
+    huntToolWindow.once('ready-to-show', () => { if (huntToolWindow && !huntToolWindow.isDestroyed()) huntToolWindow.show(); });
+    huntToolWindow.on('closed', () => { huntToolWindow = null; });
+    huntToolWindow.loadURL(url).catch(() => {});
+    return true;
+  } catch { huntToolWindow = null; return false; }
+}
+ipcMain.handle('hunt:open', (_e, data) => {
+  if (!isTrustedUi(_e) || !data || typeof data !== 'object') return false;
+  try {
+    const nome = String(data.pokemon || '').trim().toLowerCase();
+    const nivel = Math.floor(Number(data.level));
+    const routeTarget = Math.floor(Number(data.routeTarget));
+    if (!/^[\p{L}\p{N} .♀♂'\-]{1,40}$/u.test(nome) || !Number.isFinite(nivel) || nivel < 1 || nivel > 500) return false;
+    const url = new URL('https://piwtools.com.br/hunt');
+    url.searchParams.set('pokemon', nome);
+    url.searchParams.set('level', String(nivel));
+    url.searchParams.set('tab', 'route');
+    url.searchParams.set('routeTarget', String(Number.isFinite(routeTarget) && routeTarget >= nivel && routeTarget <= 500 ? routeTarget : 300));
+    url.searchParams.set('routeLevelLimit', '1');
+    for (const key of ['hp', 'atk', 'def', 'spatk', 'spdef', 'speed']) {
+      const value = Math.floor(Number(data[key]));
+      if (Number.isFinite(value) && value >= 0) url.searchParams.set(key, String(value));
+    }
+    return abrirHuntToolModal(url.toString()) ? url.toString() : false;
+  } catch { return false; }
+});
 app.on('web-contents-created', (_e, contents) => {
   if (contents.getType() !== 'webview') return;
   contents.setWindowOpenHandler(({ url }) => { abreFora(url); return { action: 'deny' }; });
@@ -199,17 +325,23 @@ app.on('web-contents-created', (_e, contents) => {
   });
   contents.on('responsive', () => { clearTimeout(hangTimer); logErro('painel', 'painel voltou a responder'); });
   contents.on('destroyed', () => clearTimeout(hangTimer));
-  // Esc com o jogo focado: avisa a interface (fechar card de IV / desexpandir) SEM consumir a
-  // tecla, o jogo usa Esc pra fechar dialogos. Por isso nao e um accelerator de menu, que engoliria.
+  // Esc/F6 com o jogo focado: avisa a interface sem consumir a tecla. Esc continua disponivel
+  // para o jogo; F6 serve para recuperar o foco depois de clicar no dashboard.
+  let ctrlPressed = false;
   contents.on('before-input-event', (_ev, input) => {
+    if (input.type === 'keyDown' && (input.key === 'Control' || input.key === 'Ctrl')) ctrlPressed = true;
+    if (input.type === 'keyUp' && (input.key === 'Control' || input.key === 'Ctrl')) ctrlPressed = false;
     if (input.type === 'keyDown' && input.key === 'Escape' && !input.isAutoRepeat) {
       try { contents.hostWebContents && contents.hostWebContents.send('hotkey', 'collapse'); } catch {}
     }
+    if (input.type === 'keyDown' && input.key === 'F6' && !input.isAutoRepeat) {
+      try { contents.hostWebContents && contents.hostWebContents.send('hotkey', 'focus'); } catch {}
+    }
   });
-  // clique direito no jogo: modo foco (expande/volta). Campo editavel fica de fora,
-  // senao o clique de colar num input viraria tela cheia.
+  // Ctrl + clique direito no jogo: modo foco (expande/volta). Clique direito comum fica
+  // livre para o jogo; campo editavel fica de fora para nao alternar ao colar num input.
   contents.on('context-menu', (_ev, params) => {
-    if (params && params.isEditable) return;
+    if (!ctrlPressed || (params && params.isEditable)) return;
     try { contents.hostWebContents && contents.hostWebContents.send('hotkey', 'ctx' + contents.id); } catch {}
   });
 });
@@ -298,11 +430,12 @@ ipcMain.handle('mintray:set', (_e, on) => { if (!isTrustedUi(_e)) return false; 
 const startupDir = () => path.join(app.getPath('appData'), 'Microsoft', 'Windows', 'Start Menu', 'Programs', 'Startup');
 const startupLnk = () => path.join(startupDir(), 'PokeGrid.lnk');
 const autoStartOn = () => { try { return process.platform === 'win32' && fs.existsSync(startupLnk()); } catch { return false; } };
+const exeReal = () => process.env.PORTABLE_EXECUTABLE_FILE || process.execPath;
 function setAutoStart(on) {
   if (process.platform !== 'win32') return false;
   try {
     if (on) {
-      const opts = { target: process.execPath, description: 'PokeGrid', appUserModelId: 'online.idleworld.pokegrid' };
+      const opts = { target: exeReal(), description: 'PokeGrid', appUserModelId: APP_USER_MODEL_ID };
       if (!app.isPackaged) opts.args = `"${app.getAppPath()}"`; // rodando pelo codigo: electron + a pasta do app
       shell.writeShortcutLink(startupLnk(), 'create', opts);
     } else {
@@ -312,7 +445,11 @@ function setAutoStart(on) {
   return autoStartOn();
 }
 ipcMain.handle('autostart:get', (e) => isTrustedUi(e) ? ({ on: autoStartOn(), suportado: process.platform === 'win32' }) : ({ on:false, suportado:false }));
-ipcMain.handle('autostart:set', (_e, on) => isTrustedUi(_e) ? setAutoStart(!!on) : false);
+let itemAuto = null;
+ipcMain.handle('autostart:set', (_e, on) => {
+  if (!isTrustedUi(_e)) return false;
+  const r = setAutoStart(!!on); if (itemAuto) itemAuto.checked = r; return r;
+});
 
 // Webhook do Discord (opcional): o usuario cola a URL do proprio servidor. So aceita o dominio
 // oficial de webhooks; o envio sai daqui porque a CSP do renderer bloqueia rede externa.
@@ -341,7 +478,7 @@ app.whenReady().then(() => {
   // Nada aqui pode derrubar a criacao da janela: se qualquer peca do sistema falhar (registro,
   // particao de sessao corrompida, bandeja), o app tem que abrir assim mesmo. Antes destas
   // guardas, uma excecao aqui deixava o processo vivo e SEM JANELA, que e o pior sintoma possivel.
-  try { app.setAppUserModelId('online.idleworld.pokegrid'); } catch (e) { logErro('boot', 'appUserModelId: ' + e.message); } // notificacoes do Windows com o nome certo
+  try { app.setAppUserModelId(APP_USER_MODEL_ID); } catch (e) { logErro('boot', 'appUserModelId: ' + e.message); } // notificacoes e agrupamento da barra com o nome certo
 
   // Nega pedidos de permissao dos jogos (mic, camera, localizacao, notificacao...).
   for (let i = 1; i <= 4; i++)
@@ -352,6 +489,7 @@ app.whenReady().then(() => {
     height: 900,
     show: false,
     autoHideMenuBar: true,
+    icon: APP_ICON,
     backgroundColor: '#0d1117',
     webPreferences: {
       webviewTag: true,
@@ -362,6 +500,7 @@ app.whenReady().then(() => {
       backgroundThrottling: false
     }
   });
+  try { win.setIcon(APP_ICON); } catch {}
   win.loadFile(path.join(__dirname, 'index.html')); // caminho absoluto: robusto no build empacotado (asar)
   win.webContents.on('will-attach-webview', (event, webPreferences, params) => {
     let origemValida = false;
@@ -392,16 +531,20 @@ app.whenReady().then(() => {
   }
 
   // Atalhos (funcionam mesmo com o jogo focado): Ctrl+1..4 expande painel, Ctrl+M mudo.
-  Menu.setApplicationMenu(Menu.buildFromTemplate([{
-    label: 'Atalhos',
-    submenu: [
-      ...[1, 2, 3, 4].map(n => ({
-        label: `Expandir painel ${n}`, accelerator: `CmdOrCtrl+${n}`,
-        click: () => win.webContents.send('hotkey', 'expand' + (n - 1))
-      })),
-      { label: 'Mudo', accelerator: 'CmdOrCtrl+M', click: () => win.webContents.send('hotkey', 'mute') }
-    ]
-  }]));
+  Menu.setApplicationMenu(Menu.buildFromTemplate([
+    ...(process.platform === 'darwin' ? [{ role: 'appMenu' }] : []),
+    { role: 'editMenu', label: 'Edição' },
+    {
+      label: 'Atalhos',
+      submenu: [
+        ...[1, 2, 3, 4].map(n => ({
+          label: `Expandir painel ${n}`, accelerator: `CmdOrCtrl+${n}`,
+          click: () => win.webContents.send('hotkey', 'expand' + (n - 1))
+        })),
+        { label: 'Mudo', accelerator: 'CmdOrCtrl+M', click: () => win.webContents.send('hotkey', 'mute') }
+      ]
+    }
+  ]));
 
   // Bandeja: minimizar esconde da barra de tarefas; clique no icone alterna.
   // Ao voltar da bandeja, restaura o mesmo estado de antes: hide()+show() no
@@ -417,7 +560,7 @@ app.whenReady().then(() => {
   const prepararBandeja = () => {
     // versao portatil movida de pasta deixa o atalho da Inicializar apontando pra um exe que nao
     // existe mais, e o botao seguia dizendo "ligado": regrava quando o alvo mudou
-    try { if (autoStartOn() && shell.readShortcutLink(startupLnk()).target !== process.execPath) setAutoStart(true); } catch {}
+    try { if (autoStartOn() && shell.readShortcutLink(startupLnk()).target !== exeReal()) setAutoStart(true); } catch {}
     // limpeza do autostart antigo (chave Run, que abria com --hidden): uma unica vez na vida
     try {
       const marca = path.join(app.getPath('userData'), 'runkey-limpo');
@@ -429,15 +572,17 @@ app.whenReady().then(() => {
   // Bandeja nao existe em todo ambiente (Linux sem indicador, por exemplo). Se falhar, o app
   // segue funcionando sem bandeja em vez de morrer no boot.
   try {
-    tray = new Tray(path.join(__dirname, 'tray.png'));
+    tray = new Tray(TRAY_ICON);
     tray.setToolTip('PokeGrid');
-    tray.setContextMenu(Menu.buildFromTemplate([
+    const menuBandeja = Menu.buildFromTemplate([
       { label: 'Mostrar', click: mostrar },
       { label: 'Abrir com o Windows', type: 'checkbox',
         checked: autoStartOn(), visible: process.platform === 'win32',
         click: (item) => { const r = setAutoStart(item.checked); item.checked = r; win.webContents.send('autostart', r); } },
       { label: 'Sair', click: () => app.quit() }
-    ]));
+    ]);
+    tray.setContextMenu(menuBandeja);
+    itemAuto = (menuBandeja.items || []).find((it) => it.type === 'checkbox') || null;
     tray.on('click', () => win.isVisible() ? win.hide() : mostrar());
   } catch (e) {
     tray = null;
